@@ -16,6 +16,14 @@ export const subagentSchema = z.object({
       "Usá letras, números, punto, guion, barra o guion bajo",
     )
     .transform((value) => value.toUpperCase()),
+  commissionPercentage: z.preprocess(
+    (value) => Number(value),
+    z
+      .number({ invalid_type_error: "Ingresá un porcentaje válido" })
+      .finite()
+      .min(0, "El porcentaje no puede ser negativo")
+      .max(100, "El porcentaje no puede superar el 100%"),
+  ),
   notes: z
     .string()
     .trim()

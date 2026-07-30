@@ -7,12 +7,14 @@ describe("subagentSchema", () => {
     const result = subagentSchema.parse({
       name: "  Agencia Norte  ",
       machineCode: " maq-01 ",
+      commissionPercentage: "12.5",
       notes: "  Turno tarde  ",
     });
 
     expect(result).toEqual({
       name: "Agencia Norte",
       machineCode: "MAQ-01",
+      commissionPercentage: 12.5,
       notes: "Turno tarde",
     });
   });
@@ -22,6 +24,18 @@ describe("subagentSchema", () => {
       subagentSchema.safeParse({
         name: "Agencia Norte",
         machineCode: "MAQ 01",
+        commissionPercentage: "10",
+        notes: "",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects commission percentages outside the valid range", () => {
+    expect(
+      subagentSchema.safeParse({
+        name: "Agencia Norte",
+        machineCode: "MAQ-01",
+        commissionPercentage: "100.01",
         notes: "",
       }).success,
     ).toBe(false);

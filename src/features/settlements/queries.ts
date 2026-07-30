@@ -48,7 +48,7 @@ export const getActiveSubagentsForSettlement = cache(async () => {
   const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("subagents")
-    .select("id, name, machine_code")
+    .select("id, name, machine_code, commission_percentage")
     .eq("status", "active")
     .order("name");
 

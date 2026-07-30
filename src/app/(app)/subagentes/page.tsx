@@ -133,6 +133,7 @@ export default async function SubagentsPage({
                 <tr>
                   <th className="px-5 py-3 font-medium">Subagente</th>
                   <th className="px-5 py-3 font-medium">Máquina</th>
+                  <th className="px-5 py-3 font-medium">Comisión</th>
                   <th className="px-5 py-3 font-medium">Estado</th>
                   <th className="px-5 py-3 font-medium">Fecha de alta</th>
                   <th className="px-5 py-3 text-right font-medium">Acciones</th>
@@ -144,6 +145,9 @@ export default async function SubagentsPage({
                     <td className="px-5 py-4 font-medium">{subagent.name}</td>
                     <td className="px-5 py-4 font-mono">
                       {subagent.machine_code}
+                    </td>
+                    <td className="px-5 py-4 font-medium">
+                      {subagent.commission_percentage}%
                     </td>
                     <td className="px-5 py-4">
                       <Badge

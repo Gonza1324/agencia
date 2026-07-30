@@ -10,7 +10,7 @@ import {
   getSubagentAuditLog,
   getSubagentById,
 } from "@/features/subagents/queries";
-import { formatDateTime, formatMoney, formatShortDate } from "@/lib/formatters";
+import { formatDateTime, formatMoney } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 type SubagentDetailPageProps = {
@@ -130,11 +130,11 @@ export default async function SubagentDetailPage({
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Alta
+              Comisión
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xl font-semibold">
-            {formatShortDate(subagent.created_at)}
+            {subagent.commission_percentage}%
           </CardContent>
         </Card>
         <Card>
@@ -182,6 +182,14 @@ export default async function SubagentDetailPage({
                   Código de máquina
                 </dt>
                 <dd className="mt-1 font-medium">{subagent.machine_code}</dd>
+              </div>
+              <div>
+                <dt className="text-sm text-muted-foreground">
+                  Comisión sobre ventas
+                </dt>
+                <dd className="mt-1 font-medium">
+                  {subagent.commission_percentage}%
+                </dd>
               </div>
               <div className="sm:col-span-2">
                 <dt className="text-sm text-muted-foreground">Notas</dt>

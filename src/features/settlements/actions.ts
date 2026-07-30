@@ -11,6 +11,9 @@ import {
   type SettlementInput,
   voidSettlementSchema,
 } from "@/features/settlements/validations";
+import { calculateSettlementAmounts } from "@/lib/commissions";
+import type { Database } from "@/types/database";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function parseSettlementForm(formData: FormData) {
   return settlementSchema.safeParse({
@@ -27,16 +30,36 @@ function parseSettlementForm(formData: FormData) {
   });
 }
 
-function getRpcArgs(input: SettlementInput) {
+async function getRpcArgs(
+  supabase: SupabaseClient<Database>,
+  input: SettlementInput,
+) {
+  const { data: subagent, error } = await supabase
+    .from("subagents")
+    .select("commission_percentage")
+    .eq("id", input.subagentId)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (error || !subagent) {
+    throw new Error("SUBAGENT_NOT_AVAILABLE");
+  }
+
+  const calculated = calculateSettlementAmounts(
+    input.salesAmount ?? null,
+    subagent.commission_percentage,
+    input.prizesPaidAmount ?? null,
+  );
+
   return {
     p_settlement_date: input.settlementDate,
     p_subagent_id: input.subagentId,
     p_cash_amount: input.cashAmount,
     p_bank_amount: input.bankAmount,
     p_sales_amount: input.salesAmount ?? null,
-    p_commission_amount: input.commissionAmount ?? null,
+    p_commission_amount: calculated.commissionAmount,
     p_prizes_paid_amount: input.prizesPaidAmount ?? null,
-    p_expected_amount: input.expectedAmount ?? null,
+    p_expected_amount: calculated.expectedAmount,
     p_notes: input.notes ?? null,
   };
 }
@@ -72,9 +95,20 @@ export async function createSettlementAction(
   }
 
   const { supabase } = await requireOperator();
+  let rpcArgs;
+
+  try {
+    rpcArgs = await getRpcArgs(supabase, parsed.data);
+  } catch {
+    return {
+      status: "error",
+      message: "El Subagente ya no está disponible.",
+    };
+  }
+
   const { data: id, error } = await supabase.rpc(
     "create_daily_settlement",
-    getRpcArgs(parsed.data),
+    rpcArgs,
   );
 
   if (error) {
@@ -107,9 +141,20 @@ export async function updateSettlementAction(
   }
 
   const { supabase } = await requireOperator();
+  let rpcArgs;
+
+  try {
+    rpcArgs = await getRpcArgs(supabase, parsed.data);
+  } catch {
+    return {
+      status: "error",
+      message: "El Subagente ya no está disponible.",
+    };
+  }
+
   const { data: id, error } = await supabase.rpc("replace_daily_settlement", {
     p_previous_settlement_id: parsedId.data,
-    ...getRpcArgs(parsed.data),
+    ...rpcArgs,
   });
 
   if (error) {

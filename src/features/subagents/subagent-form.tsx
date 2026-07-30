@@ -21,6 +21,7 @@ type SubagentFormProps = {
     id: string;
     name: string;
     machineCode: string;
+    commissionPercentage: number;
     notes: string;
   };
 };
@@ -95,6 +96,39 @@ export function SubagentForm({ mode, subagent }: SubagentFormProps) {
             required
           />
           <FieldError errors={state.fieldErrors?.machineCode} />
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-medium">Comisión sobre la venta</span>
+          <div className="relative mt-1">
+            <input
+              className="h-10 w-full rounded-md border bg-background px-3 pr-9 text-sm outline-none focus:ring-2 focus:ring-ring"
+              type="number"
+              name="commissionPercentage"
+              list="commission-percentages"
+              defaultValue={subagent?.commissionPercentage ?? 10}
+              min="0"
+              max="100"
+              step="0.01"
+              aria-invalid={Boolean(state.fieldErrors?.commissionPercentage)}
+              required
+            />
+            <span className="pointer-events-none absolute right-3 top-2 text-sm text-muted-foreground">
+              %
+            </span>
+          </div>
+          <datalist id="commission-percentages">
+            <option value="5" />
+            <option value="7.5" />
+            <option value="10" />
+            <option value="12.5" />
+            <option value="15" />
+            <option value="20" />
+          </datalist>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Elegí una sugerencia o escribí cualquier porcentaje.
+          </p>
+          <FieldError errors={state.fieldErrors?.commissionPercentage} />
         </label>
       </div>
 

@@ -42,6 +42,7 @@ export default async function EditSubagentPage({
           id: subagent.id,
           name: subagent.name,
           machineCode: subagent.machine_code,
+          commissionPercentage: subagent.commission_percentage,
           notes: subagent.notes ?? "",
         }}
       />

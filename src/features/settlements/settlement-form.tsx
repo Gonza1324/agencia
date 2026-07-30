@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { LoaderCircle, Save } from "lucide-react";
 
@@ -14,11 +14,17 @@ import {
   initialSettlementFormState,
   type SettlementFormState,
 } from "@/features/settlements/state";
+import { calculateSettlementAmounts } from "@/lib/commissions";
 import { cn } from "@/lib/utils";
 
 type SettlementFormProps = {
   mode: "create" | "edit";
-  subagents: Array<{ id: string; machine_code: string; name: string }>;
+  subagents: Array<{
+    commission_percentage: number;
+    id: string;
+    machine_code: string;
+    name: string;
+  }>;
   settlement?: {
     bankAmount: number;
     cashAmount: number;
@@ -74,6 +80,25 @@ export function SettlementForm({
     action,
     initialSettlementFormState,
   );
+  const [subagentId, setSubagentId] = useState(settlement?.subagentId ?? "");
+  const [salesAmount, setSalesAmount] = useState(
+    settlement?.salesAmount?.toString() ?? "",
+  );
+  const [prizesPaidAmount, setPrizesPaidAmount] = useState(
+    settlement?.prizesPaidAmount?.toString() ?? "",
+  );
+  const selectedSubagent = subagents.find(
+    (subagent) => subagent.id === subagentId,
+  );
+  const calculatedAmounts = useMemo(
+    () =>
+      calculateSettlementAmounts(
+        salesAmount === "" ? null : Number(salesAmount),
+        selectedSubagent?.commission_percentage ?? 0,
+        prizesPaidAmount === "" ? null : Number(prizesPaidAmount),
+      ),
+    [prizesPaidAmount, salesAmount, selectedSubagent?.commission_percentage],
+  );
 
   return (
     <form action={formAction} className="space-y-6">
@@ -101,7 +126,8 @@ export function SettlementForm({
           <select
             className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             name="subagentId"
-            defaultValue={settlement?.subagentId ?? ""}
+            value={subagentId}
+            onChange={(event) => setSubagentId(event.target.value)}
             aria-invalid={Boolean(state.fieldErrors?.subagentId)}
             required
           >
@@ -162,30 +188,37 @@ export function SettlementForm({
           <MoneyField
             label="Venta del día"
             name="salesAmount"
-            defaultValue={settlement?.salesAmount}
+            value={salesAmount}
+            onChange={setSalesAmount}
             errors={state.fieldErrors?.salesAmount}
           />
-          <MoneyField
-            label="Comisión"
+          <CalculatedMoneyField
+            label={`Comisión${
+              selectedSubagent
+                ? ` (${selectedSubagent.commission_percentage}%)`
+                : ""
+            }`}
             name="commissionAmount"
-            defaultValue={settlement?.commissionAmount}
+            value={calculatedAmounts.commissionAmount}
             errors={state.fieldErrors?.commissionAmount}
           />
           <MoneyField
             label="Premios pagados"
             name="prizesPaidAmount"
-            defaultValue={settlement?.prizesPaidAmount}
+            value={prizesPaidAmount}
+            onChange={setPrizesPaidAmount}
             errors={state.fieldErrors?.prizesPaidAmount}
           />
-          <MoneyField
+          <CalculatedMoneyField
             label="Importe que debía rendir"
             name="expectedAmount"
-            defaultValue={settlement?.expectedAmount}
+            value={calculatedAmounts.expectedAmount}
             errors={state.fieldErrors?.expectedAmount}
           />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          La deuda solo se calcula cuando se informa el importe esperado.
+          La comisión y el importe a rendir se calculan automáticamente con el
+          porcentaje configurado para el Subagente.
         </p>
       </fieldset>
 
@@ -235,13 +268,17 @@ function MoneyField({
   errors,
   label,
   name,
+  onChange,
   required,
+  value,
 }: {
   defaultValue?: number | null;
   errors?: string[];
   label: string;
   name: string;
+  onChange?: (value: string) => void;
   required?: boolean;
+  value?: string;
 }) {
   return (
     <label className="block">
@@ -251,9 +288,43 @@ function MoneyField({
         type="number"
         name={name}
         defaultValue={defaultValue ?? ""}
+        value={value}
+        onChange={
+          onChange ? (event) => onChange(event.target.value) : undefined
+        }
         min="0"
         step="0.01"
         required={required}
+        aria-invalid={Boolean(errors)}
+      />
+      <FieldError errors={errors} />
+    </label>
+  );
+}
+
+function CalculatedMoneyField({
+  errors,
+  label,
+  name,
+  value,
+}: {
+  errors?: string[];
+  label: string;
+  name: string;
+  value: number | null;
+}) {
+  return (
+    <label className="block">
+      <span className="text-sm font-medium">{label}</span>
+      <input
+        className="mt-1 h-10 w-full rounded-md border bg-muted/60 px-3 text-sm font-medium text-foreground"
+        type="number"
+        name={name}
+        value={value ?? ""}
+        min="0"
+        step="0.01"
+        readOnly
+        aria-readonly="true"
         aria-invalid={Boolean(errors)}
       />
       <FieldError errors={errors} />

@@ -453,6 +453,7 @@ export type Database = {
         Row: {
           business_day_id: string;
           commission_amount: number | null;
+          commission_percentage: number | null;
           created_at: string;
           created_by: string | null;
           debt_amount: number;
@@ -474,6 +475,7 @@ export type Database = {
         Insert: {
           business_day_id: string;
           commission_amount?: number | null;
+          commission_percentage?: number | null;
           created_at?: string;
           created_by?: string | null;
           debt_amount?: number;
@@ -495,6 +497,7 @@ export type Database = {
         Update: {
           business_day_id?: string;
           commission_amount?: number | null;
+          commission_percentage?: number | null;
           created_at?: string;
           created_by?: string | null;
           debt_amount?: number;
@@ -748,6 +751,7 @@ export type Database = {
       };
       subagents: {
         Row: {
+          commission_percentage: number;
           created_at: string;
           created_by: string | null;
           id: string;
@@ -759,6 +763,7 @@ export type Database = {
           updated_by: string | null;
         };
         Insert: {
+          commission_percentage?: number;
           created_at?: string;
           created_by?: string | null;
           id?: string;
@@ -770,6 +775,7 @@ export type Database = {
           updated_by?: string | null;
         };
         Update: {
+          commission_percentage?: number;
           created_at?: string;
           created_by?: string | null;
           id?: string;

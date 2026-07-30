@@ -114,7 +114,14 @@ export default async function SettlementDetailPage({
           <h2 className="text-xl font-semibold">Detalle del cierre</h2>
           <dl className="mt-5 grid gap-4 sm:grid-cols-2">
             <Detail label="Venta" value={settlement.sales_amount} />
-            <Detail label="Comisión" value={settlement.commission_amount} />
+            <Detail
+              label={`Comisión${
+                settlement.commission_percentage === null
+                  ? ""
+                  : ` (${settlement.commission_percentage}%)`
+              }`}
+              value={settlement.commission_amount}
+            />
             <Detail
               label="Premios pagados"
               value={settlement.prizes_paid_amount}

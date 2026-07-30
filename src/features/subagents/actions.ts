@@ -13,6 +13,7 @@ function getSubagentInput(formData: FormData) {
   return subagentSchema.safeParse({
     name: formData.get("name"),
     machineCode: formData.get("machineCode"),
+    commissionPercentage: formData.get("commissionPercentage"),
     notes: formData.get("notes"),
   });
 }
@@ -45,6 +46,7 @@ export async function createSubagentAction(
     .insert({
       name: parsedInput.data.name,
       machine_code: parsedInput.data.machineCode,
+      commission_percentage: parsedInput.data.commissionPercentage,
       notes: parsedInput.data.notes ?? null,
       created_by: user.id,
       updated_by: user.id,
@@ -86,6 +88,7 @@ export async function updateSubagentAction(
     .update({
       name: parsedInput.data.name,
       machine_code: parsedInput.data.machineCode,
+      commission_percentage: parsedInput.data.commissionPercentage,
       notes: parsedInput.data.notes ?? null,
       updated_by: user.id,
     })
