@@ -1,6 +1,20 @@
 import { LoginForm } from "@/features/auth/login-form";
+import { initialLoginState, type LoginState } from "@/features/auth/state";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{ reason?: string }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { reason } = await searchParams;
+  const loginState: LoginState =
+    reason === "unauthorized"
+      ? {
+          status: "error",
+          message: "Tu usuario no tiene acceso de propietario activo.",
+        }
+      : initialLoginState;
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <section className="w-full max-w-md rounded-lg border bg-card p-8 shadow-sm">
@@ -13,7 +27,7 @@ export default function LoginPage() {
             Acceso interno para Juliana, Gerónimo y Agustina.
           </p>
         </div>
-        <LoginForm />
+        <LoginForm initialState={loginState} />
       </section>
     </main>
   );

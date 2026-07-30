@@ -1,20 +1,26 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { hasPublicSupabaseEnv } from "@/lib/env";
 
 export default async function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  if (!hasPublicSupabaseEnv()) {
-    return <AppShell>{children}</AppShell>;
-  }
-
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const { data: profile } = user
+    ? await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle()
+    : { data: null };
 
-  return <AppShell userEmail={user?.email}>{children}</AppShell>;
+  return (
+    <AppShell userEmail={user?.email} userName={profile?.full_name}>
+      {children}
+    </AppShell>
+  );
 }

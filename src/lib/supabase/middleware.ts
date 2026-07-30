@@ -21,7 +21,10 @@ export async function updateSession(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!hasPublicSupabaseEnv() || !url || !anonKey) {
-    return response;
+    return NextResponse.json(
+      { error: "La aplicación no tiene configurada la conexión a Supabase." },
+      { status: 503 },
+    );
   }
 
   const supabase = createServerClient<Database>(url, anonKey, {
@@ -30,7 +33,9 @@ export async function updateSession(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet: CookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        );
         response = NextResponse.next({
           request,
         });
@@ -45,17 +50,34 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublicRoute = publicRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route),
+  const isPublicRoute = publicRoutes.some(
+    (route) =>
+      request.nextUrl.pathname === route ||
+      request.nextUrl.pathname.startsWith(`${route}/`),
   );
+  let isOwnerAdmin = false;
 
-  if (!user && !isPublicRoute) {
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    isOwnerAdmin =
+      profile?.role === "owner_admin" && profile.status === "active";
+  }
+
+  if ((!user || !isOwnerAdmin) && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
+    if (user) {
+      redirectUrl.searchParams.set("reason", "unauthorized");
+    }
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (user && request.nextUrl.pathname === "/login") {
+  if (user && isOwnerAdmin && request.nextUrl.pathname === "/login") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/dashboard";
     return NextResponse.redirect(redirectUrl);

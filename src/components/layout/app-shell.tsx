@@ -6,8 +6,10 @@ import {
   LayoutDashboard,
   ReceiptText,
   Settings,
+  LogOut,
   UsersRound,
 } from "lucide-react";
+import { logoutAction } from "@/features/auth/actions";
 import { navigationItems } from "@/config/navigation";
 
 const iconMap = {
@@ -23,9 +25,10 @@ const iconMap = {
 type AppShellProps = {
   children: React.ReactNode;
   userEmail?: string;
+  userName?: string;
 };
 
-export function AppShell({ children, userEmail }: AppShellProps) {
+export function AppShell({ children, userEmail, userName }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r bg-card px-4 py-5 lg:block">
@@ -59,13 +62,26 @@ export function AppShell({ children, userEmail }: AppShellProps) {
         <header className="sticky top-0 z-10 border-b bg-card/95 px-4 py-3 backdrop-blur md:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="lg:hidden">
-              <p className="text-sm font-semibold text-primary">Control Agencia</p>
-            </div>
-            <div className="ml-auto text-right">
-              <p className="text-xs text-muted-foreground">Usuario</p>
-              <p className="text-sm font-medium">
-                {userEmail ?? "Pendiente de login"}
+              <p className="text-sm font-semibold text-primary">
+                Control Agencia
               </p>
+            </div>
+            <div className="ml-auto flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-sm font-medium">
+                  {userName ?? "Propietario"}
+                </p>
+                <p className="text-xs text-muted-foreground">{userEmail}</p>
+              </div>
+              <form action={logoutAction}>
+                <button
+                  className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium transition hover:bg-muted"
+                  type="submit"
+                >
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Salir</span>
+                </button>
+              </form>
             </div>
           </div>
         </header>

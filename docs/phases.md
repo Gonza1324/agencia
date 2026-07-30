@@ -8,9 +8,14 @@ Base técnica, estructura de carpetas, documentación, Supabase preparado y layo
 
 Login, logout, rutas protegidas, perfiles y rol `owner_admin`.
 
+Estado: completa. Los primeros usuarios `owner_admin` fueron provisionados
+fuera del repositorio y verificados contra Supabase Auth y RLS.
+
 ## Fase 1.2 — Modelo de datos base
 
 Verificación de migraciones, RLS, seeds y generación de tipos Supabase.
+
+Estado: completa.
 
 ## Fase 1.3 — Subagentes
 
