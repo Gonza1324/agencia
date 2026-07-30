@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.5 — Rendiciones.
+Fase 1.6 — Caja.
 
 La base incluye:
 
@@ -31,6 +31,9 @@ La base incluye:
 - Rendiciones con efectivo, transferencia o pago mixto.
 - Movimientos de caja y deuda conocida generados transaccionalmente.
 - Correcciones y anulaciones auditadas sin borrado físico.
+- Saldos separados de efectivo, banco y total.
+- Ingresos, egresos, retiros, ajustes y transferencias internas.
+- Ganancia operativa y categorías configurables.
 
 ## Requisitos
 
@@ -100,6 +103,6 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.6: caja, saldos y movimientos manuales.
-2. Fase 1.7: cuenta corriente de Subagentes.
-3. Fase 1.8: cierre diario.
+1. Fase 1.7: cuenta corriente de Subagentes.
+2. Fase 1.8: cierre diario.
+3. Fase 1.9: reportes.

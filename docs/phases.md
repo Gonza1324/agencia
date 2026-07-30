@@ -43,6 +43,10 @@ pagos en efectivo/banco/mixtos y generación transaccional de caja y deuda.
 
 Saldos, ingresos, egresos, retiros, ajustes y categorías.
 
+Estado: completa. Incluye saldos por cuenta, ganancia operativa, movimientos
+manuales, transferencias atómicas, prevención de sobregiros y categorías
+configurables.
+
 ## Fase 1.7 — Cuenta corriente
 
 Saldo por Subagente, pagos de deuda, ajustes, compensaciones e historial.

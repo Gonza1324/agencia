@@ -27,6 +27,8 @@ La base está diseñada para Supabase/PostgreSQL con RLS desde el inicio.
   obtiene mediante funciones PostgreSQL protegidas por RLS.
 - Las rendiciones y todos sus efectos asociados se crean, reemplazan o anulan
   dentro de una única transacción PostgreSQL.
+- Los saldos de Caja se derivan de movimientos activos; las transferencias
+  internas se enlazan con `transfer_group_id`.
 - Rendiciones anuladas no bloquean una nueva rendición para la misma fecha.
 - Deuda monetaria solo existe cuando se cargó `expected_amount`.
 - RLS inicial permite gestión completa solo a `owner_admin`.

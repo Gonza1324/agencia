@@ -338,6 +338,7 @@ export type Database = {
           owner_name: string | null;
           related_settlement_id: string | null;
           related_subagent_account_movement_id: string | null;
+          transfer_group_id: string | null;
           type: Database["public"]["Enums"]["cash_movement_type"];
           updated_at: string;
           updated_by: string | null;
@@ -359,6 +360,7 @@ export type Database = {
           owner_name?: string | null;
           related_settlement_id?: string | null;
           related_subagent_account_movement_id?: string | null;
+          transfer_group_id?: string | null;
           type: Database["public"]["Enums"]["cash_movement_type"];
           updated_at?: string;
           updated_by?: string | null;
@@ -380,6 +382,7 @@ export type Database = {
           owner_name?: string | null;
           related_settlement_id?: string | null;
           related_subagent_account_movement_id?: string | null;
+          transfer_group_id?: string | null;
           type?: Database["public"]["Enums"]["cash_movement_type"];
           updated_at?: string;
           updated_by?: string | null;
@@ -799,6 +802,20 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_manual_cash_movement: {
+        Args: {
+          p_amount: number;
+          p_business_date: string;
+          p_cash_account_id: string;
+          p_category_id: string | null;
+          p_description?: string | null;
+          p_direction: Database["public"]["Enums"]["cash_movement_direction"];
+          p_note?: string | null;
+          p_owner_name?: string | null;
+          p_type: Database["public"]["Enums"]["cash_movement_type"];
+        };
+        Returns: string;
+      };
       create_daily_settlement: {
         Args: {
           p_bank_amount: number;
@@ -816,6 +833,17 @@ export type Database = {
       ensure_current_business_day: {
         Args: never;
         Returns: Database["public"]["Tables"]["business_days"]["Row"][];
+      };
+      get_cash_summary: {
+        Args: never;
+        Returns: {
+          bank_balance: number;
+          cash_balance: number;
+          operating_expense: number;
+          operating_income: number;
+          operating_profit: number;
+          total_balance: number;
+        }[];
       };
       get_subagent_dashboard: {
         Args: { p_date?: string };
@@ -850,6 +878,10 @@ export type Database = {
       };
       void_daily_settlement: {
         Args: { p_reason: string; p_settlement_id: string };
+        Returns: undefined;
+      };
+      void_manual_cash_movement: {
+        Args: { p_movement_id: string; p_reason: string };
         Returns: undefined;
       };
     };
