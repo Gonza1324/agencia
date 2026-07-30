@@ -36,6 +36,9 @@ datos reales.
 
 Carga de rendición, medios de pago, deuda conocida, movimientos de caja y auditoría.
 
+Estado: completa. Incluye listado, alta, corrección versionada, anulación,
+pagos en efectivo/banco/mixtos y generación transaccional de caja y deuda.
+
 ## Fase 1.6 — Caja
 
 Saldos, ingresos, egresos, retiros, ajustes y categorías.

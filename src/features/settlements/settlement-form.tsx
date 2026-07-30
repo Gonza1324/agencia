@@ -1,0 +1,262 @@
+"use client";
+
+import Link from "next/link";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
+import { LoaderCircle, Save } from "lucide-react";
+
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  createSettlementAction,
+  updateSettlementAction,
+} from "@/features/settlements/actions";
+import {
+  initialSettlementFormState,
+  type SettlementFormState,
+} from "@/features/settlements/state";
+import { cn } from "@/lib/utils";
+
+type SettlementFormProps = {
+  mode: "create" | "edit";
+  subagents: Array<{ id: string; machine_code: string; name: string }>;
+  settlement?: {
+    bankAmount: number;
+    cashAmount: number;
+    commissionAmount: number | null;
+    expectedAmount: number | null;
+    id: string;
+    notes: string;
+    paymentMethod: "bank_transfer" | "cash" | "mixed";
+    prizesPaidAmount: number | null;
+    salesAmount: number | null;
+    settlementDate: string;
+    subagentId: string;
+  };
+  today: string;
+};
+
+function FieldError({ errors }: { errors?: string[] }) {
+  return errors?.length ? (
+    <p className="mt-1 text-xs text-destructive" role="alert">
+      {errors[0]}
+    </p>
+  ) : null;
+}
+
+function SubmitButton({ mode }: { mode: SettlementFormProps["mode"] }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? (
+        <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+      ) : (
+        <Save className="h-4 w-4" aria-hidden="true" />
+      )}
+      {pending
+        ? "Guardando..."
+        : mode === "create"
+          ? "Registrar rendición"
+          : "Guardar corrección"}
+    </Button>
+  );
+}
+
+export function SettlementForm({
+  mode,
+  settlement,
+  subagents,
+  today,
+}: SettlementFormProps) {
+  const action =
+    mode === "create" ? createSettlementAction : updateSettlementAction;
+  const [state, formAction] = useActionState<SettlementFormState, FormData>(
+    action,
+    initialSettlementFormState,
+  );
+
+  return (
+    <form action={formAction} className="space-y-6">
+      {settlement ? (
+        <input type="hidden" name="id" value={settlement.id} />
+      ) : null}
+
+      <div className="grid gap-5 md:grid-cols-2">
+        <label className="block">
+          <span className="text-sm font-medium">Fecha operativa</span>
+          <input
+            className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            type="date"
+            name="settlementDate"
+            defaultValue={settlement?.settlementDate ?? today}
+            max={today}
+            aria-invalid={Boolean(state.fieldErrors?.settlementDate)}
+            required
+          />
+          <FieldError errors={state.fieldErrors?.settlementDate} />
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-medium">Subagente</span>
+          <select
+            className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            name="subagentId"
+            defaultValue={settlement?.subagentId ?? ""}
+            aria-invalid={Boolean(state.fieldErrors?.subagentId)}
+            required
+          >
+            <option value="" disabled>
+              Seleccionar Subagente
+            </option>
+            {subagents.map((subagent) => (
+              <option key={subagent.id} value={subagent.id}>
+                {subagent.name} · {subagent.machine_code}
+              </option>
+            ))}
+          </select>
+          <FieldError errors={state.fieldErrors?.subagentId} />
+        </label>
+      </div>
+
+      <fieldset className="rounded-lg border p-5">
+        <legend className="px-2 font-semibold">Pago recibido</legend>
+        <div className="grid gap-5 md:grid-cols-3">
+          <label className="block">
+            <span className="text-sm font-medium">Medio de pago</span>
+            <select
+              className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              name="paymentMethod"
+              defaultValue={settlement?.paymentMethod ?? "cash"}
+            >
+              <option value="cash">Efectivo</option>
+              <option value="bank_transfer">Transferencia</option>
+              <option value="mixed">Mixto</option>
+            </select>
+            <FieldError errors={state.fieldErrors?.paymentMethod} />
+          </label>
+          <MoneyField
+            label="Monto efectivo"
+            name="cashAmount"
+            defaultValue={settlement?.cashAmount ?? 0}
+            errors={state.fieldErrors?.cashAmount}
+            required
+          />
+          <MoneyField
+            label="Monto banco"
+            name="bankAmount"
+            defaultValue={settlement?.bankAmount ?? 0}
+            errors={state.fieldErrors?.bankAmount}
+            required
+          />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          En pagos mixtos, ambos montos deben ser mayores a cero.
+        </p>
+      </fieldset>
+
+      <fieldset className="rounded-lg border p-5">
+        <legend className="px-2 font-semibold">
+          Información del cierre (opcional)
+        </legend>
+        <div className="grid gap-5 md:grid-cols-2">
+          <MoneyField
+            label="Venta del día"
+            name="salesAmount"
+            defaultValue={settlement?.salesAmount}
+            errors={state.fieldErrors?.salesAmount}
+          />
+          <MoneyField
+            label="Comisión"
+            name="commissionAmount"
+            defaultValue={settlement?.commissionAmount}
+            errors={state.fieldErrors?.commissionAmount}
+          />
+          <MoneyField
+            label="Premios pagados"
+            name="prizesPaidAmount"
+            defaultValue={settlement?.prizesPaidAmount}
+            errors={state.fieldErrors?.prizesPaidAmount}
+          />
+          <MoneyField
+            label="Importe que debía rendir"
+            name="expectedAmount"
+            defaultValue={settlement?.expectedAmount}
+            errors={state.fieldErrors?.expectedAmount}
+          />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          La deuda solo se calcula cuando se informa el importe esperado.
+        </p>
+      </fieldset>
+
+      <label className="block">
+        <span className="text-sm font-medium">Observaciones</span>
+        <textarea
+          className="mt-1 min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+          name="notes"
+          defaultValue={settlement?.notes}
+          maxLength={1000}
+          placeholder="Información adicional del cierre"
+        />
+        <FieldError errors={state.fieldErrors?.notes} />
+      </label>
+
+      {state.message ? (
+        <p
+          className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          role="alert"
+        >
+          {state.message}
+        </p>
+      ) : null}
+
+      {mode === "edit" ? (
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          La corrección anulará la versión actual y creará una nueva para
+          conservar el historial.
+        </p>
+      ) : null}
+
+      <div className="flex flex-wrap justify-end gap-3 border-t pt-5">
+        <Link
+          href={settlement ? `/rendiciones/${settlement.id}` : "/rendiciones"}
+          className={cn(buttonVariants({ variant: "secondary" }))}
+        >
+          Cancelar
+        </Link>
+        <SubmitButton mode={mode} />
+      </div>
+    </form>
+  );
+}
+
+function MoneyField({
+  defaultValue,
+  errors,
+  label,
+  name,
+  required,
+}: {
+  defaultValue?: number | null;
+  errors?: string[];
+  label: string;
+  name: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block">
+      <span className="text-sm font-medium">{label}</span>
+      <input
+        className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+        type="number"
+        name={name}
+        defaultValue={defaultValue ?? ""}
+        min="0"
+        step="0.01"
+        required={required}
+        aria-invalid={Boolean(errors)}
+      />
+      <FieldError errors={errors} />
+    </label>
+  );
+}

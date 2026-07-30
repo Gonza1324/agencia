@@ -588,6 +588,9 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_method"];
           notes: string | null;
           settlement_id: string;
+          void_reason: string | null;
+          voided_at: string | null;
+          voided_by: string | null;
         };
         Insert: {
           amount: number;
@@ -598,6 +601,9 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_method"];
           notes?: string | null;
           settlement_id: string;
+          void_reason?: string | null;
+          voided_at?: string | null;
+          voided_by?: string | null;
         };
         Update: {
           amount?: number;
@@ -608,6 +614,9 @@ export type Database = {
           method?: Database["public"]["Enums"]["payment_method"];
           notes?: string | null;
           settlement_id?: string;
+          void_reason?: string | null;
+          voided_at?: string | null;
+          voided_by?: string | null;
         };
         Relationships: [
           {
@@ -629,6 +638,13 @@ export type Database = {
             columns: ["settlement_id"];
             isOneToOne: false;
             referencedRelation: "daily_settlements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "settlement_payments_voided_by_fkey";
+            columns: ["voided_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -783,6 +799,20 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_daily_settlement: {
+        Args: {
+          p_bank_amount: number;
+          p_cash_amount: number;
+          p_commission_amount?: number | null;
+          p_expected_amount?: number | null;
+          p_notes?: string | null;
+          p_prizes_paid_amount?: number | null;
+          p_sales_amount?: number | null;
+          p_settlement_date: string;
+          p_subagent_id: string;
+        };
+        Returns: string;
+      };
       ensure_current_business_day: {
         Args: never;
         Returns: Database["public"]["Tables"]["business_days"]["Row"][];
@@ -803,6 +833,25 @@ export type Database = {
         }[];
       };
       is_owner_admin: { Args: never; Returns: boolean };
+      replace_daily_settlement: {
+        Args: {
+          p_bank_amount: number;
+          p_cash_amount: number;
+          p_commission_amount?: number | null;
+          p_expected_amount?: number | null;
+          p_notes?: string | null;
+          p_previous_settlement_id: string;
+          p_prizes_paid_amount?: number | null;
+          p_sales_amount?: number | null;
+          p_settlement_date: string;
+          p_subagent_id: string;
+        };
+        Returns: string;
+      };
+      void_daily_settlement: {
+        Args: { p_reason: string; p_settlement_id: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       account_movement_direction: "debit" | "credit";

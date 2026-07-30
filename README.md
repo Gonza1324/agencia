@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.4 — Día operativo y dashboard base.
+Fase 1.5 — Rendiciones.
 
 La base incluye:
 
@@ -28,6 +28,9 @@ La base incluye:
 - Día operativo automático de lunes a sábado en horario argentino.
 - Dashboard real con rendiciones, pendientes y alertas progresivas.
 - Domingos sin apertura ni pendientes nuevos.
+- Rendiciones con efectivo, transferencia o pago mixto.
+- Movimientos de caja y deuda conocida generados transaccionalmente.
+- Correcciones y anulaciones auditadas sin borrado físico.
 
 ## Requisitos
 
@@ -97,6 +100,6 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.5: carga de rendiciones y movimientos asociados.
-2. Fase 1.6: caja, saldos y movimientos manuales.
-3. Fase 1.7: cuenta corriente de Subagentes.
+1. Fase 1.6: caja, saldos y movimientos manuales.
+2. Fase 1.7: cuenta corriente de Subagentes.
+3. Fase 1.8: cierre diario.
