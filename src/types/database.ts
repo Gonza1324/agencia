@@ -454,6 +454,7 @@ export type Database = {
           business_day_id: string;
           commission_amount: number | null;
           commission_percentage: number | null;
+          credit_balance_amount: number;
           created_at: string;
           created_by: string | null;
           debt_amount: number;
@@ -476,6 +477,7 @@ export type Database = {
           business_day_id: string;
           commission_amount?: number | null;
           commission_percentage?: number | null;
+          credit_balance_amount?: number;
           created_at?: string;
           created_by?: string | null;
           debt_amount?: number;
@@ -498,6 +500,7 @@ export type Database = {
           business_day_id?: string;
           commission_amount?: number | null;
           commission_percentage?: number | null;
+          credit_balance_amount?: number;
           created_at?: string;
           created_by?: string | null;
           debt_amount?: number;
@@ -1032,6 +1035,7 @@ export type Database = {
       account_movement_direction: "debit" | "credit";
       account_movement_type:
         | "settlement_debt"
+        | "prize_credit"
         | "debt_payment"
         | "positive_adjustment"
         | "negative_adjustment"
@@ -1185,6 +1189,7 @@ export const Constants = {
       account_movement_direction: ["debit", "credit"],
       account_movement_type: [
         "settlement_debt",
+        "prize_credit",
         "debt_payment",
         "positive_adjustment",
         "negative_adjustment",

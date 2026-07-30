@@ -145,12 +145,14 @@ export default async function SubagentDetailPage({
           </CardHeader>
           <CardContent>
             <p className="text-xl font-semibold">
-              {formatMoney(Number(accountSummary?.balance ?? 0))}
+              {formatMoney(Math.abs(Number(accountSummary?.balance ?? 0)))}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {Number(accountSummary?.balance ?? 0) > 0
                 ? "Deuda vigente del Subagente."
-                : "Sin deuda vigente."}
+                : Number(accountSummary?.balance ?? 0) < 0
+                  ? "Saldo a favor del Subagente."
+                  : "Sin deuda vigente."}
             </p>
           </CardContent>
         </Card>

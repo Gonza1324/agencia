@@ -44,7 +44,7 @@ export const settlementSchema = z
   .superRefine((value, context) => {
     const receivedAmount = value.cashAmount + value.bankAmount;
 
-    if (receivedAmount <= 0) {
+    if (receivedAmount <= 0 && value.expectedAmount !== 0) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Ingresá al menos un pago",

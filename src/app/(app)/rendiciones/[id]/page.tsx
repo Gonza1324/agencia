@@ -107,6 +107,12 @@ export default async function SettlementDetailPage({
           label="Deuda generada"
           value={formatMoney(Number(settlement.debt_amount))}
         />
+        {Number(settlement.credit_balance_amount) > 0 ? (
+          <Summary
+            label="Saldo a favor generado"
+            value={formatMoney(Number(settlement.credit_balance_amount))}
+          />
+        ) : null}
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -141,20 +147,26 @@ export default async function SettlementDetailPage({
 
         <section className="rounded-lg border bg-card p-6">
           <h2 className="text-xl font-semibold">Medios de pago</h2>
-          <ul className="mt-5 space-y-3">
-            {displayedPayments.map((payment) => (
-              <li
-                key={payment.id}
-                className="flex items-center justify-between rounded-md border p-3"
-              >
-                <span>
-                  {payment.method === "cash" ? "Efectivo" : "Transferencia"}
-                  {payment.voided_at ? " (anulado)" : ""}
-                </span>
-                <strong>{formatMoney(Number(payment.amount))}</strong>
-              </li>
-            ))}
-          </ul>
+          {displayedPayments.length ? (
+            <ul className="mt-5 space-y-3">
+              {displayedPayments.map((payment) => (
+                <li
+                  key={payment.id}
+                  className="flex items-center justify-between rounded-md border p-3"
+                >
+                  <span>
+                    {payment.method === "cash" ? "Efectivo" : "Transferencia"}
+                    {payment.voided_at ? " (anulado)" : ""}
+                  </span>
+                  <strong>{formatMoney(Number(payment.amount))}</strong>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-5 rounded-md border bg-muted/50 p-4 text-sm text-muted-foreground">
+              Sin ingreso: el importe esperado de esta rendición fue $0.
+            </p>
+          )}
         </section>
       </div>
 

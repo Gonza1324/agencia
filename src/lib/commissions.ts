@@ -6,6 +6,7 @@ export function calculateSettlementAmounts(
   if (salesAmount === null || !Number.isFinite(salesAmount)) {
     return {
       commissionAmount: null,
+      creditBalanceAmount: 0,
       expectedAmount: null,
     };
   }
@@ -14,12 +15,16 @@ export function calculateSettlementAmounts(
     Math.round(
       (salesAmount * (commissionPercentage / 100) + Number.EPSILON) * 100,
     ) / 100;
-  const expectedAmount =
+  const netAmount =
     Math.round(
-      (Math.max(salesAmount - commissionAmount - (prizesPaidAmount ?? 0), 0) +
+      (salesAmount -
+        commissionAmount -
+        (prizesPaidAmount ?? 0) +
         Number.EPSILON) *
         100,
     ) / 100;
+  const expectedAmount = Math.max(netAmount, 0);
+  const creditBalanceAmount = Math.max(-netAmount, 0);
 
-  return { commissionAmount, expectedAmount };
+  return { commissionAmount, creditBalanceAmount, expectedAmount };
 }

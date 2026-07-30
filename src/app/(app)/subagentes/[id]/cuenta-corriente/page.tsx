@@ -21,6 +21,7 @@ type SubagentAccountPageProps = {
 
 const movementLabels = {
   settlement_debt: "Deuda por rendición",
+  prize_credit: "Saldo a favor por premios",
   debt_payment: "Pago de deuda",
   positive_adjustment: "Ajuste que aumenta deuda",
   negative_adjustment: "Ajuste que reduce deuda",
@@ -55,7 +56,11 @@ export default async function SubagentAccountPage({
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-semibold">Cuenta corriente</h1>
             <Badge variant={balance > 0 ? "warning" : "success"}>
-              {balance > 0 ? "Con deuda" : "Al día"}
+              {balance > 0
+                ? "Con deuda"
+                : balance < 0
+                  ? "Saldo a favor"
+                  : "Al día"}
             </Badge>
           </div>
           <p className="mt-1 text-muted-foreground">
@@ -88,8 +93,8 @@ export default async function SubagentAccountPage({
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
-          label="Saldo adeudado"
-          value={formatMoney(balance)}
+          label={balance < 0 ? "Saldo a favor" : "Saldo adeudado"}
+          value={formatMoney(Math.abs(balance))}
           emphasized={balance > 0}
         />
         <SummaryCard

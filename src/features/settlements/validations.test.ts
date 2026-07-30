@@ -46,4 +46,30 @@ describe("settlementSchema", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("accepts a zero payment when the expected amount is zero", () => {
+    expect(
+      settlementSchema.safeParse({
+        ...validSettlement,
+        paymentMethod: "cash",
+        cashAmount: "0",
+        bankAmount: "0",
+        salesAmount: "154190",
+        prizesPaidAmount: "648490",
+        expectedAmount: "0",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("still rejects a zero payment when money is expected", () => {
+    expect(
+      settlementSchema.safeParse({
+        ...validSettlement,
+        paymentMethod: "cash",
+        cashAmount: "0",
+        bankAmount: "0",
+        expectedAmount: "100",
+      }).success,
+    ).toBe(false);
+  });
 });

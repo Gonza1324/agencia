@@ -15,6 +15,7 @@ import {
   type SettlementFormState,
 } from "@/features/settlements/state";
 import { calculateSettlementAmounts } from "@/lib/commissions";
+import { formatMoney } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 type SettlementFormProps = {
@@ -220,6 +221,15 @@ export function SettlementForm({
           La comisión y el importe a rendir se calculan automáticamente con el
           porcentaje configurado para el Subagente.
         </p>
+        {calculatedAmounts.creditBalanceAmount > 0 ? (
+          <p
+            className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+            role="status"
+          >
+            Saldo a favor que se acreditará en la cuenta corriente:{" "}
+            {formatMoney(calculatedAmounts.creditBalanceAmount)}
+          </p>
+        ) : null}
       </fieldset>
 
       <label className="block">
