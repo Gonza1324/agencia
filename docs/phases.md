@@ -74,3 +74,7 @@ y retiros agrupados por dueño.
 ## Fase 1.10 — Pulido
 
 Responsive, estados vacíos, errores, confirmaciones, tests y documentación final.
+
+Estado: completa. Incluye navegación móvil, estado activo accesible, pantallas
+globales de carga/error/404, confirmaciones para acciones sensibles, cabeceras
+de seguridad, endpoint de salud y suite automatizada de reglas de negocio.

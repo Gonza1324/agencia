@@ -31,6 +31,15 @@ export function VoidAccountMovementForm({
     <form
       action={voidSubagentAccountMovementAction}
       className="flex w-full flex-col gap-2 sm:flex-row"
+      onSubmit={(event) => {
+        if (
+          !window.confirm(
+            "¿Confirmás anular este movimiento y su asiento de Caja asociado?",
+          )
+        ) {
+          event.preventDefault();
+        }
+      }}
     >
       <input type="hidden" name="movementId" value={movementId} />
       <input type="hidden" name="subagentId" value={subagentId} />

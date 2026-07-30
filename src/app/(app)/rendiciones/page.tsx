@@ -59,7 +59,7 @@ export default async function SettlementsPage({
     <div className="space-y-6">
       <header className="flex flex-col justify-between gap-4 border-b pb-5 md:flex-row md:items-end">
         <div>
-          <p className="text-sm font-medium text-primary">Fase 1.5</p>
+          <p className="text-sm font-medium text-primary">Operación diaria</p>
           <h1 className="mt-1 text-2xl font-semibold">Rendiciones</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Ingresos diarios de Subagentes, medios de pago y deuda conocida.

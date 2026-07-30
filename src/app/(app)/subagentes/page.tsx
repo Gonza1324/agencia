@@ -45,7 +45,7 @@ export default async function SubagentsPage({
     <div className="space-y-6">
       <header className="flex flex-col justify-between gap-4 border-b pb-5 md:flex-row md:items-end">
         <div>
-          <p className="text-sm font-medium text-primary">Fase 1.3</p>
+          <p className="text-sm font-medium text-primary">Gestión operativa</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-normal">
             Subagentes
           </h1>

@@ -4,9 +4,9 @@ Web app interna para una Agencia Oficial de Lotería Correntina.
 
 Slug técnico: `loteria-control`.
 
-## Fase actual
+## Estado
 
-Fase 1.9 — Reportes operativos.
+Fase 1 completa — versión 1.0.0 preparada para producción.
 
 La base incluye:
 
@@ -45,6 +45,11 @@ La base incluye:
 - Reportes diarios, semanales y mensuales filtrables.
 - Ganancia operativa, evolución de Caja y saldos históricos.
 - Rankings de Subagentes, atrasos, deudas y retiros por dueño.
+- Navegación responsive para desktop y mobile.
+- Estados globales de carga, error y página no encontrada.
+- Confirmaciones para operaciones sensibles.
+- Tests automatizados de reglas de negocio.
+- Cabeceras de seguridad y endpoint de salud.
 
 ## Requisitos
 
@@ -73,7 +78,9 @@ npm install
 npm run dev
 npm run typecheck
 npm run lint
+npm run test
 npm run build
+npm run check
 ```
 
 ## Supabase
@@ -112,6 +119,7 @@ Después de crear usuarios en Supabase Auth, crear su perfil en
 El procedimiento seguro y la consulta de bootstrap están documentados en
 [`docs/auth.md`](docs/auth.md).
 
-## Próximas fases
+## Producción
 
-1. Fase 1.10: pulido, tests y documentación final.
+El procedimiento de verificación, variables, despliegue y recuperación está en
+[`docs/production.md`](docs/production.md).

@@ -40,7 +40,22 @@ export function DailyClosureForm({
   const hasDifference = differences.cash !== 0 || differences.bank !== 0;
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form
+      action={formAction}
+      className="space-y-5"
+      onSubmit={(event) => {
+        const detail = hasDifference
+          ? " El cierre contiene diferencias y conservará la nota ingresada."
+          : "";
+        if (
+          !window.confirm(
+            `¿Confirmás cerrar el día ${businessDate}?${detail} No se podrán registrar movimientos hasta reabrirlo.`,
+          )
+        ) {
+          event.preventDefault();
+        }
+      }}
+    >
       <input type="hidden" name="businessDate" value={businessDate} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field

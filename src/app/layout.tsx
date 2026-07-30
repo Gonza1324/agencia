@@ -2,8 +2,16 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Control Agencia",
+  applicationName: "Control Agencia",
+  title: {
+    default: "Control Agencia",
+    template: "%s | Control Agencia",
+  },
   description: "Panel interno para control diario de caja y subagentes.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({

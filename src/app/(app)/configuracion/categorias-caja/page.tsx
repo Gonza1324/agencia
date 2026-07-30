@@ -2,10 +2,8 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  saveCashCategoryAction,
-  toggleCashCategoryAction,
-} from "@/features/cash/actions";
+import { CashCategoryStatusForm } from "@/features/cash/cash-category-status-form";
+import { saveCashCategoryAction } from "@/features/cash/actions";
 import { getCashCategories } from "@/features/cash/queries";
 
 type CategoriesPageProps = {
@@ -119,17 +117,11 @@ export default async function CashCategoriesPage({
                     Guardar
                   </Button>
                 </form>
-                <form action={toggleCashCategoryAction}>
-                  <input type="hidden" name="id" value={category.id} />
-                  <Button
-                    type="submit"
-                    variant={
-                      category.status === "active" ? "destructive" : "secondary"
-                    }
-                  >
-                    {category.status === "active" ? "Inactivar" : "Activar"}
-                  </Button>
-                </form>
+                <CashCategoryStatusForm
+                  id={category.id}
+                  name={category.name}
+                  status={category.status}
+                />
               </>
             )}
           </div>

@@ -22,7 +22,19 @@ export function ReopenBusinessDayForm({
   );
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form
+      action={formAction}
+      className="space-y-4"
+      onSubmit={(event) => {
+        if (
+          !window.confirm(
+            `¿Confirmás reabrir el día ${businessDate}? Volverá a aceptar movimientos y rendiciones.`,
+          )
+        ) {
+          event.preventDefault();
+        }
+      }}
+    >
       <input type="hidden" name="businessDate" value={businessDate} />
       <label className="block">
         <span className="text-sm font-medium">Motivo de reapertura</span>

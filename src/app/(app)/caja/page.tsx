@@ -23,7 +23,7 @@ export default async function CashPage() {
     <div className="space-y-6">
       <header className="flex flex-col justify-between gap-4 border-b pb-5 md:flex-row md:items-end">
         <div>
-          <p className="text-sm font-medium text-primary">Fase 1.6</p>
+          <p className="text-sm font-medium text-primary">Control financiero</p>
           <h1 className="mt-1 text-2xl font-semibold">Caja</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Saldos derivados del historial de movimientos activos.
