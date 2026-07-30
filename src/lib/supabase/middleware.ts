@@ -5,7 +5,7 @@ import type { CookieOptions } from "@supabase/ssr";
 import type { Database } from "@/types/database";
 import type { UserRole } from "@/types/domain";
 
-const publicRoutes = ["/login"];
+const publicRoutes = ["/login", "/actualizar-clave"];
 
 type CookiesToSet = {
   name: string;
@@ -88,6 +88,14 @@ export async function updateSession(request: NextRequest) {
     redirectUrl.pathname =
       activeRole === "subagent" ? "/mi-cuenta" : "/dashboard";
     return NextResponse.redirect(redirectUrl);
+  }
+
+  if (
+    user &&
+    activeRole &&
+    request.nextUrl.pathname === "/actualizar-clave"
+  ) {
+    return response;
   }
 
   const pathname = request.nextUrl.pathname;
