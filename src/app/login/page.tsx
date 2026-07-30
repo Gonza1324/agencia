@@ -24,7 +24,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Ingresar al panel
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Acceso interno para Gonzalo, Juliana y Agustina.
+            Acceso interno para Agencia 643.
           </p>
         </div>
         <LoginForm initialState={loginState} />
