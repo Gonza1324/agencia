@@ -336,6 +336,7 @@ export type Database = {
           id: string;
           note: string | null;
           owner_name: string | null;
+          related_expense_obligation_id: string | null;
           related_settlement_id: string | null;
           related_subagent_account_movement_id: string | null;
           transfer_group_id: string | null;
@@ -358,6 +359,7 @@ export type Database = {
           id?: string;
           note?: string | null;
           owner_name?: string | null;
+          related_expense_obligation_id?: string | null;
           related_settlement_id?: string | null;
           related_subagent_account_movement_id?: string | null;
           transfer_group_id?: string | null;
@@ -380,6 +382,7 @@ export type Database = {
           id?: string;
           note?: string | null;
           owner_name?: string | null;
+          related_expense_obligation_id?: string | null;
           related_settlement_id?: string | null;
           related_subagent_account_movement_id?: string | null;
           transfer_group_id?: string | null;
@@ -420,6 +423,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "cash_movements_related_expense_obligation_id_fkey";
+            columns: ["related_expense_obligation_id"];
+            isOneToOne: false;
+            referencedRelation: "expense_obligations";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "cash_movements_related_settlement_id_fkey";
             columns: ["related_settlement_id"];
             isOneToOne: false;
@@ -454,9 +464,9 @@ export type Database = {
           business_day_id: string;
           commission_amount: number | null;
           commission_percentage: number | null;
-          credit_balance_amount: number;
           created_at: string;
           created_by: string | null;
+          credit_balance_amount: number;
           debt_amount: number;
           expected_amount: number | null;
           id: string;
@@ -478,9 +488,9 @@ export type Database = {
           business_day_id: string;
           commission_amount?: number | null;
           commission_percentage?: number | null;
-          credit_balance_amount?: number;
           created_at?: string;
           created_by?: string | null;
+          credit_balance_amount?: number;
           debt_amount?: number;
           expected_amount?: number | null;
           id?: string;
@@ -502,9 +512,9 @@ export type Database = {
           business_day_id?: string;
           commission_amount?: number | null;
           commission_percentage?: number | null;
-          credit_balance_amount?: number;
           created_at?: string;
           created_by?: string | null;
+          credit_balance_amount?: number;
           debt_amount?: number;
           expected_amount?: number | null;
           id?: string;
@@ -554,6 +564,125 @@ export type Database = {
           {
             foreignKeyName: "daily_settlements_voided_by_fkey";
             columns: ["voided_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      expense_obligations: {
+        Row: {
+          amount: number;
+          cancellation_reason: string | null;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
+          category_id: string;
+          created_at: string;
+          created_by: string | null;
+          description: string;
+          due_date: string;
+          id: string;
+          notes: string | null;
+          paid_at: string | null;
+          paid_business_date: string | null;
+          paid_by: string | null;
+          paid_cash_account_id: string | null;
+          paid_cash_movement_id: string | null;
+          recurrence_months: number | null;
+          status: Database["public"]["Enums"]["expense_obligation_status"];
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          amount: number;
+          cancellation_reason?: string | null;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
+          category_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          description: string;
+          due_date: string;
+          id?: string;
+          notes?: string | null;
+          paid_at?: string | null;
+          paid_business_date?: string | null;
+          paid_by?: string | null;
+          paid_cash_account_id?: string | null;
+          paid_cash_movement_id?: string | null;
+          recurrence_months?: number | null;
+          status?: Database["public"]["Enums"]["expense_obligation_status"];
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          amount?: number;
+          cancellation_reason?: string | null;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
+          category_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string;
+          due_date?: string;
+          id?: string;
+          notes?: string | null;
+          paid_at?: string | null;
+          paid_business_date?: string | null;
+          paid_by?: string | null;
+          paid_cash_account_id?: string | null;
+          paid_cash_movement_id?: string | null;
+          recurrence_months?: number | null;
+          status?: Database["public"]["Enums"]["expense_obligation_status"];
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "expense_obligations_cancelled_by_fkey";
+            columns: ["cancelled_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expense_obligations_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "cash_categories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expense_obligations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expense_obligations_paid_by_fkey";
+            columns: ["paid_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expense_obligations_paid_cash_account_id_fkey";
+            columns: ["paid_cash_account_id"];
+            isOneToOne: false;
+            referencedRelation: "cash_accounts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expense_obligations_paid_cash_movement_id_fkey";
+            columns: ["paid_cash_movement_id"];
+            isOneToOne: false;
+            referencedRelation: "cash_movements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expense_obligations_updated_by_fkey";
+            columns: ["updated_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -839,6 +968,17 @@ export type Database = {
         };
         Returns: string;
       };
+      create_expense_obligation: {
+        Args: {
+          p_amount: number;
+          p_category_id: string;
+          p_description: string;
+          p_due_date: string;
+          p_notes?: string | null;
+          p_recurrence_months?: number | null;
+        };
+        Returns: string;
+      };
       create_manual_cash_movement: {
         Args: {
           p_amount: number;
@@ -1002,6 +1142,14 @@ export type Database = {
       };
       is_internal_user: { Args: never; Returns: boolean };
       is_owner_admin: { Args: never; Returns: boolean };
+      pay_expense_obligation: {
+        Args: {
+          p_business_date: string;
+          p_cash_account_id: string;
+          p_obligation_id: string;
+        };
+        Returns: string;
+      };
       reopen_business_day: {
         Args: { p_business_date: string; p_reason: string };
         Returns: string;
@@ -1052,6 +1200,7 @@ export type Database = {
       cash_movement_type:
         "income" | "expense" | "withdrawal" | "adjustment" | "transfer";
       closure_status: "closed" | "reopened";
+      expense_obligation_status: "pending" | "paid" | "cancelled";
       payment_method: "cash" | "bank_transfer";
       record_status: "active" | "inactive";
       settlement_status:
@@ -1213,6 +1362,7 @@ export const Constants = {
         "transfer",
       ],
       closure_status: ["closed", "reopened"],
+      expense_obligation_status: ["pending", "paid", "cancelled"],
       payment_method: ["cash", "bank_transfer"],
       record_status: ["active", "inactive"],
       settlement_status: [

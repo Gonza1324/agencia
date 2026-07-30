@@ -29,6 +29,12 @@ export const navigationItems = [
     roles: operatorRoles,
   },
   {
+    href: "/gastos",
+    label: "Gastos",
+    icon: "expenses",
+    roles: operatorRoles,
+  },
+  {
     href: "/cierre-diario",
     label: "Cierre diario",
     icon: "closure",
