@@ -109,8 +109,14 @@ export default async function SettlementDetailPage({
         />
         {Number(settlement.credit_balance_amount) > 0 ? (
           <Summary
-            label="Saldo a favor generado"
+            label="Saldo a favor por premios"
             value={formatMoney(Number(settlement.credit_balance_amount))}
+          />
+        ) : null}
+        {Number(settlement.overpayment_credit_amount) > 0 ? (
+          <Summary
+            label="Saldo a favor por pago excedente"
+            value={formatMoney(Number(settlement.overpayment_credit_amount))}
           />
         ) : null}
       </section>

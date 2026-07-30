@@ -38,6 +38,18 @@ describe("settlementSchema", () => {
     ).toBe(false);
   });
 
+  it("accepts received money above expected after explicit confirmation", () => {
+    expect(
+      settlementSchema.safeParse({
+        ...validSettlement,
+        cashAmount: "700",
+        bankAmount: "500",
+        expectedAmount: "1000",
+        confirmOverpayment: "true",
+      }).success,
+    ).toBe(true);
+  });
+
   it("rejects Sunday settlements", () => {
     expect(
       settlementSchema.safeParse({

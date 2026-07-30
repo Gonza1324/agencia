@@ -461,6 +461,7 @@ export type Database = {
           expected_amount: number | null;
           id: string;
           notes: string | null;
+          overpayment_credit_amount: number;
           prizes_paid_amount: number | null;
           received_amount: number;
           sales_amount: number | null;
@@ -484,6 +485,7 @@ export type Database = {
           expected_amount?: number | null;
           id?: string;
           notes?: string | null;
+          overpayment_credit_amount?: number;
           prizes_paid_amount?: number | null;
           received_amount: number;
           sales_amount?: number | null;
@@ -507,6 +509,7 @@ export type Database = {
           expected_amount?: number | null;
           id?: string;
           notes?: string | null;
+          overpayment_credit_amount?: number;
           prizes_paid_amount?: number | null;
           received_amount?: number;
           sales_amount?: number | null;
@@ -1036,6 +1039,7 @@ export type Database = {
       account_movement_type:
         | "settlement_debt"
         | "prize_credit"
+        | "overpayment_credit"
         | "debt_payment"
         | "positive_adjustment"
         | "negative_adjustment"
@@ -1190,6 +1194,7 @@ export const Constants = {
       account_movement_type: [
         "settlement_debt",
         "prize_credit",
+        "overpayment_credit",
         "debt_payment",
         "positive_adjustment",
         "negative_adjustment",

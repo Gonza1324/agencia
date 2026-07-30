@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
+import {
+  type FormEvent,
+  useActionState,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useFormStatus } from "react-dom";
 import { LoaderCircle, Save } from "lucide-react";
 
@@ -81,7 +87,17 @@ export function SettlementForm({
     action,
     initialSettlementFormState,
   );
+  const formRef = useRef<HTMLFormElement>(null);
+  const confirmationInputRef = useRef<HTMLInputElement>(null);
+  const [showOverpaymentConfirmation, setShowOverpaymentConfirmation] =
+    useState(false);
   const [subagentId, setSubagentId] = useState(settlement?.subagentId ?? "");
+  const [cashAmount, setCashAmount] = useState(
+    settlement?.cashAmount.toString() ?? "0",
+  );
+  const [bankAmount, setBankAmount] = useState(
+    settlement?.bankAmount.toString() ?? "0",
+  );
   const [salesAmount, setSalesAmount] = useState(
     settlement?.salesAmount?.toString() ?? "",
   );
@@ -100,9 +116,57 @@ export function SettlementForm({
       ),
     [prizesPaidAmount, salesAmount, selectedSubagent?.commission_percentage],
   );
+  const receivedAmount = (Number(cashAmount) || 0) + (Number(bankAmount) || 0);
+  const overpaymentAmount =
+    calculatedAmounts.expectedAmount === null
+      ? 0
+      : Math.max(
+          Math.round(
+            (receivedAmount -
+              calculatedAmounts.expectedAmount +
+              Number.EPSILON) *
+              100,
+          ) / 100,
+          0,
+        );
+
+  function resetOverpaymentConfirmation() {
+    if (confirmationInputRef.current) {
+      confirmationInputRef.current.value = "false";
+    }
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (
+      overpaymentAmount > 0 &&
+      confirmationInputRef.current?.value !== "true"
+    ) {
+      event.preventDefault();
+      setShowOverpaymentConfirmation(true);
+    }
+  }
+
+  function confirmOverpayment() {
+    if (confirmationInputRef.current) {
+      confirmationInputRef.current.value = "true";
+    }
+    setShowOverpaymentConfirmation(false);
+    formRef.current?.requestSubmit();
+  }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form
+      ref={formRef}
+      action={formAction}
+      className="space-y-6"
+      onSubmit={handleSubmit}
+    >
+      <input
+        ref={confirmationInputRef}
+        type="hidden"
+        name="confirmOverpayment"
+        defaultValue="false"
+      />
       {settlement ? (
         <input type="hidden" name="id" value={settlement.id} />
       ) : null}
@@ -128,7 +192,10 @@ export function SettlementForm({
             className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             name="subagentId"
             value={subagentId}
-            onChange={(event) => setSubagentId(event.target.value)}
+            onChange={(event) => {
+              resetOverpaymentConfirmation();
+              setSubagentId(event.target.value);
+            }}
             aria-invalid={Boolean(state.fieldErrors?.subagentId)}
             required
           >
@@ -164,14 +231,22 @@ export function SettlementForm({
           <MoneyField
             label="Monto efectivo"
             name="cashAmount"
-            defaultValue={settlement?.cashAmount ?? 0}
+            value={cashAmount}
+            onChange={(value) => {
+              resetOverpaymentConfirmation();
+              setCashAmount(value);
+            }}
             errors={state.fieldErrors?.cashAmount}
             required
           />
           <MoneyField
             label="Monto banco"
             name="bankAmount"
-            defaultValue={settlement?.bankAmount ?? 0}
+            value={bankAmount}
+            onChange={(value) => {
+              resetOverpaymentConfirmation();
+              setBankAmount(value);
+            }}
             errors={state.fieldErrors?.bankAmount}
             required
           />
@@ -190,7 +265,10 @@ export function SettlementForm({
             label="Venta del día"
             name="salesAmount"
             value={salesAmount}
-            onChange={setSalesAmount}
+            onChange={(value) => {
+              resetOverpaymentConfirmation();
+              setSalesAmount(value);
+            }}
             errors={state.fieldErrors?.salesAmount}
           />
           <CalculatedMoneyField
@@ -207,7 +285,10 @@ export function SettlementForm({
             label="Premios pagados"
             name="prizesPaidAmount"
             value={prizesPaidAmount}
-            onChange={setPrizesPaidAmount}
+            onChange={(value) => {
+              resetOverpaymentConfirmation();
+              setPrizesPaidAmount(value);
+            }}
             errors={state.fieldErrors?.prizesPaidAmount}
           />
           <CalculatedMoneyField
@@ -269,6 +350,54 @@ export function SettlementForm({
         </Link>
         <SubmitButton mode={mode} />
       </div>
+
+      {showOverpaymentConfirmation ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setShowOverpaymentConfirmation(false);
+            }
+          }}
+        >
+          <section
+            aria-describedby="overpayment-description"
+            aria-labelledby="overpayment-title"
+            aria-modal="true"
+            className="w-full max-w-md rounded-xl border bg-card p-6 shadow-2xl"
+            role="dialog"
+          >
+            <h2 id="overpayment-title" className="text-xl font-semibold">
+              El pago supera el importe esperado
+            </h2>
+            <p
+              id="overpayment-description"
+              className="mt-3 text-sm leading-6 text-muted-foreground"
+            >
+              Se recibieron {formatMoney(receivedAmount)} y se esperaban{" "}
+              {formatMoney(calculatedAmounts.expectedAmount ?? 0)}. La
+              diferencia de {formatMoney(overpaymentAmount)} quedará como saldo
+              a favor en la cuenta corriente del Subagente.
+            </p>
+            <p className="mt-3 text-sm font-medium">
+              ¿Querés registrar igualmente la rendición?
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowOverpaymentConfirmation(false)}
+              >
+                Revisar importes
+              </Button>
+              <Button type="button" onClick={confirmOverpayment}>
+                Confirmar y guardar
+              </Button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </form>
   );
 }

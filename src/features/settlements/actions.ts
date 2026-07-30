@@ -26,6 +26,7 @@ function parseSettlementForm(formData: FormData) {
     commissionAmount: formData.get("commissionAmount"),
     prizesPaidAmount: formData.get("prizesPaidAmount"),
     expectedAmount: formData.get("expectedAmount"),
+    confirmOverpayment: formData.get("confirmOverpayment"),
     notes: formData.get("notes"),
   });
 }
@@ -50,6 +51,15 @@ async function getRpcArgs(
     subagent.commission_percentage,
     input.prizesPaidAmount ?? null,
   );
+  const receivedAmount = input.cashAmount + input.bankAmount;
+
+  if (
+    calculated.expectedAmount !== null &&
+    receivedAmount > calculated.expectedAmount &&
+    !input.confirmOverpayment
+  ) {
+    throw new Error("OVERPAYMENT_CONFIRMATION_REQUIRED");
+  }
 
   return {
     p_settlement_date: input.settlementDate,
@@ -99,10 +109,14 @@ export async function createSettlementAction(
 
   try {
     rpcArgs = await getRpcArgs(supabase, parsed.data);
-  } catch {
+  } catch (error) {
     return {
       status: "error",
-      message: "El Subagente ya no está disponible.",
+      message:
+        error instanceof Error &&
+        error.message === "OVERPAYMENT_CONFIRMATION_REQUIRED"
+          ? "Confirmá el pago superior al importe esperado."
+          : "El Subagente ya no está disponible.",
     };
   }
 
@@ -145,10 +159,14 @@ export async function updateSettlementAction(
 
   try {
     rpcArgs = await getRpcArgs(supabase, parsed.data);
-  } catch {
+  } catch (error) {
     return {
       status: "error",
-      message: "El Subagente ya no está disponible.",
+      message:
+        error instanceof Error &&
+        error.message === "OVERPAYMENT_CONFIRMATION_REQUIRED"
+          ? "Confirmá el pago superior al importe esperado."
+          : "El Subagente ya no está disponible.",
     };
   }
 

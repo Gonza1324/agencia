@@ -34,6 +34,7 @@ export const settlementSchema = z
     commissionAmount: optionalMoney,
     prizesPaidAmount: optionalMoney,
     expectedAmount: optionalMoney,
+    confirmOverpayment: z.preprocess((value) => value === "true", z.boolean()),
     notes: z
       .string()
       .trim()
@@ -81,11 +82,12 @@ export const settlementSchema = z
 
     if (
       value.expectedAmount !== undefined &&
-      receivedAmount > value.expectedAmount
+      receivedAmount > value.expectedAmount &&
+      !value.confirmOverpayment
     ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "No puede superar el importe esperado",
+        message: "Confirmá el pago superior al importe esperado",
         path: ["expectedAmount"],
       });
     }

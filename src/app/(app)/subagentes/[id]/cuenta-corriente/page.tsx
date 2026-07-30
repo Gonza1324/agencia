@@ -22,6 +22,7 @@ type SubagentAccountPageProps = {
 const movementLabels = {
   settlement_debt: "Deuda por rendición",
   prize_credit: "Saldo a favor por premios",
+  overpayment_credit: "Saldo a favor por pago excedente",
   debt_payment: "Pago de deuda",
   positive_adjustment: "Ajuste que aumenta deuda",
   negative_adjustment: "Ajuste que reduce deuda",
