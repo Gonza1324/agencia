@@ -86,3 +86,11 @@ Administración interna de accesos, roles efectivos y estados.
 Estado: completa. Incluye altas con contraseña temporal, cambios de nombre,
 rol y estado, restablecimiento de contraseña, auditoría, navegación por rol y
 políticas RLS diferenciadas para propietarios, operadores y visores.
+
+## Fase 1.12 — Gastos y obligaciones
+
+Planificación de egresos, vencimientos y pagos conectados con Caja.
+
+Estado: completa. Incluye obligaciones únicas y recurrentes, estados
+pendiente/pagada/cancelada, métricas de vencimientos, edición previa al pago,
+cancelación con motivo y generación transaccional del egreso de Caja.

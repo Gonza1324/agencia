@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  cancelExpenseObligationSchema,
   expenseObligationSchema,
   payExpenseSchema,
 } from "@/features/expenses/validations";
@@ -29,5 +30,22 @@ describe("payExpenseSchema", () => {
         cashAccountId: "22222222-2222-4222-8222-222222222222",
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("cancelExpenseObligationSchema", () => {
+  it("requires a meaningful cancellation reason", () => {
+    expect(
+      cancelExpenseObligationSchema.safeParse({
+        obligationId: "11111111-1111-4111-8111-111111111111",
+        reason: "  ",
+      }).success,
+    ).toBe(false);
+    expect(
+      cancelExpenseObligationSchema.safeParse({
+        obligationId: "11111111-1111-4111-8111-111111111111",
+        reason: "Se rescindió el servicio",
+      }).success,
+    ).toBe(true);
   });
 });

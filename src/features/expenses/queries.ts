@@ -41,3 +41,20 @@ export const getExpensePageData = cache(async () => {
     obligations: obligationsResult.data,
   };
 });
+
+export const getExpenseObligationForEdit = cache(async (id: string) => {
+  const { supabase } = await requireOperator();
+  const { data, error } = await supabase
+    .from("expense_obligations")
+    .select(
+      "id, amount, category_id, description, due_date, notes, recurrence_months, status",
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error("No se pudo cargar la obligación.");
+  }
+
+  return data;
+});

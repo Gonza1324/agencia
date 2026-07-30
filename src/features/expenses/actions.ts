@@ -6,15 +6,14 @@ import { redirect } from "next/navigation";
 import { requireOperator } from "@/features/auth/guards";
 import type { ExpenseFormState } from "@/features/expenses/state";
 import {
+  cancelExpenseObligationSchema,
+  expenseObligationIdSchema,
   expenseObligationSchema,
   payExpenseSchema,
 } from "@/features/expenses/validations";
 
-export async function createExpenseObligationAction(
-  _previousState: ExpenseFormState,
-  formData: FormData,
-): Promise<ExpenseFormState> {
-  const parsed = expenseObligationSchema.safeParse({
+function parseExpenseForm(formData: FormData) {
+  return expenseObligationSchema.safeParse({
     description: formData.get("description"),
     categoryId: formData.get("categoryId"),
     amount: formData.get("amount"),
@@ -22,6 +21,13 @@ export async function createExpenseObligationAction(
     recurrenceMonths: formData.get("recurrenceMonths"),
     notes: formData.get("notes"),
   });
+}
+
+export async function createExpenseObligationAction(
+  _previousState: ExpenseFormState,
+  formData: FormData,
+): Promise<ExpenseFormState> {
+  const parsed = parseExpenseForm(formData);
 
   if (!parsed.success) {
     return {
@@ -51,6 +57,93 @@ export async function createExpenseObligationAction(
   revalidatePath("/gastos");
   revalidatePath("/dashboard");
   redirect(`/gastos?created=${id}`);
+}
+
+export async function updateExpenseObligationAction(
+  _previousState: ExpenseFormState,
+  formData: FormData,
+): Promise<ExpenseFormState> {
+  const parsedId = expenseObligationIdSchema.safeParse(
+    formData.get("obligationId"),
+  );
+  const parsed = parseExpenseForm(formData);
+
+  if (!parsedId.success || !parsed.success) {
+    return {
+      status: "error",
+      message: "Revisá los campos indicados.",
+      fieldErrors: parsed.success
+        ? undefined
+        : parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  const { supabase } = await requireOperator();
+  const { data: id, error } = await supabase.rpc(
+    "update_expense_obligation",
+    {
+      p_obligation_id: parsedId.data,
+      p_description: parsed.data.description,
+      p_category_id: parsed.data.categoryId,
+      p_amount: parsed.data.amount,
+      p_due_date: parsed.data.dueDate,
+      p_recurrence_months: parsed.data.recurrenceMonths ?? null,
+      p_notes: parsed.data.notes ?? null,
+    },
+  );
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message.includes("pendientes")
+        ? "La obligación ya no está pendiente y no se puede modificar."
+        : "No se pudo actualizar el gasto. Intentá nuevamente.",
+    };
+  }
+
+  revalidatePath("/gastos");
+  revalidatePath("/dashboard");
+  redirect(`/gastos?updated=${id}`);
+}
+
+export async function cancelExpenseObligationAction(
+  _previousState: ExpenseFormState,
+  formData: FormData,
+): Promise<ExpenseFormState> {
+  const parsed = cancelExpenseObligationSchema.safeParse({
+    obligationId: formData.get("obligationId"),
+    reason: formData.get("reason"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Ingresá un motivo válido.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  const { supabase } = await requireOperator();
+  const { data: id, error } = await supabase.rpc(
+    "cancel_expense_obligation",
+    {
+      p_obligation_id: parsed.data.obligationId,
+      p_reason: parsed.data.reason,
+    },
+  );
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message.includes("pendientes")
+        ? "La obligación ya no está pendiente."
+        : "No se pudo cancelar la obligación. Intentá nuevamente.",
+    };
+  }
+
+  revalidatePath("/gastos");
+  revalidatePath("/dashboard");
+  redirect(`/gastos?cancelled=${id}`);
 }
 
 export async function payExpenseObligationAction(formData: FormData) {

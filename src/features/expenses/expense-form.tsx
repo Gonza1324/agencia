@@ -6,7 +6,10 @@ import { useFormStatus } from "react-dom";
 import { LoaderCircle } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { createExpenseObligationAction } from "@/features/expenses/actions";
+import {
+  createExpenseObligationAction,
+  updateExpenseObligationAction,
+} from "@/features/expenses/actions";
 import {
   initialExpenseFormState,
   type ExpenseFormState,
@@ -18,18 +21,34 @@ const fieldClassName =
 
 export function ExpenseForm({
   categories,
+  obligation,
   today,
 }: {
   categories: Array<{ id: string; name: string }>;
+  obligation?: {
+    id: string;
+    amount: number;
+    category_id: string;
+    description: string;
+    due_date: string;
+    notes: string | null;
+    recurrence_months: number | null;
+  };
   today: string;
 }) {
+  const action = obligation
+    ? updateExpenseObligationAction
+    : createExpenseObligationAction;
   const [state, formAction] = useActionState<ExpenseFormState, FormData>(
-    createExpenseObligationAction,
+    action,
     initialExpenseFormState,
   );
 
   return (
     <form action={formAction} className="space-y-6">
+      {obligation ? (
+        <input type="hidden" name="obligationId" value={obligation.id} />
+      ) : null}
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Descripción" errors={state.fieldErrors?.description}>
           <input
@@ -37,6 +56,7 @@ export function ExpenseForm({
             name="description"
             maxLength={160}
             placeholder="Ej. Alquiler del local"
+            defaultValue={obligation?.description}
             required
           />
         </Field>
@@ -44,7 +64,7 @@ export function ExpenseForm({
           <select
             className={fieldClassName}
             name="categoryId"
-            defaultValue=""
+            defaultValue={obligation?.category_id ?? ""}
             required
           >
             <option value="" disabled>
@@ -64,6 +84,7 @@ export function ExpenseForm({
             name="amount"
             min="0.01"
             step="0.01"
+            defaultValue={obligation?.amount}
             required
           />
         </Field>
@@ -72,7 +93,7 @@ export function ExpenseForm({
             className={fieldClassName}
             type="date"
             name="dueDate"
-            defaultValue={today}
+            defaultValue={obligation?.due_date ?? today}
             required
           />
         </Field>
@@ -80,7 +101,7 @@ export function ExpenseForm({
           <select
             className={fieldClassName}
             name="recurrenceMonths"
-            defaultValue=""
+            defaultValue={obligation?.recurrence_months?.toString() ?? ""}
           >
             <option value="">Una sola vez</option>
             <option value="1">Mensual</option>
@@ -98,6 +119,7 @@ export function ExpenseForm({
           name="notes"
           maxLength={500}
           placeholder="Información opcional"
+          defaultValue={obligation?.notes ?? ""}
         />
       </Field>
 
@@ -114,7 +136,7 @@ export function ExpenseForm({
         >
           Cancelar
         </Link>
-        <SubmitButton />
+        <SubmitButton editing={Boolean(obligation)} />
       </div>
     </form>
   );
@@ -140,7 +162,7 @@ function Field({
   );
 }
 
-function SubmitButton() {
+function SubmitButton({ editing }: { editing: boolean }) {
   const { pending } = useFormStatus();
 
   return (
@@ -148,7 +170,11 @@ function SubmitButton() {
       {pending ? (
         <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
       ) : null}
-      {pending ? "Guardando..." : "Guardar obligación"}
+      {pending
+        ? "Guardando..."
+        : editing
+          ? "Guardar cambios"
+          : "Guardar obligación"}
     </Button>
   );
 }

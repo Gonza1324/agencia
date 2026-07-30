@@ -945,6 +945,10 @@ export type Database = {
     Functions: {
       can_manage_users: { Args: never; Returns: boolean };
       can_operate: { Args: never; Returns: boolean };
+      cancel_expense_obligation: {
+        Args: { p_obligation_id: string; p_reason: string };
+        Returns: string;
+      };
       close_business_day: {
         Args: {
           p_business_date: string;
@@ -1147,6 +1151,18 @@ export type Database = {
           p_business_date: string;
           p_cash_account_id: string;
           p_obligation_id: string;
+        };
+        Returns: string;
+      };
+      update_expense_obligation: {
+        Args: {
+          p_amount: number;
+          p_category_id: string;
+          p_description: string;
+          p_due_date: string;
+          p_notes?: string | null;
+          p_obligation_id: string;
+          p_recurrence_months?: number | null;
         };
         Returns: string;
       };

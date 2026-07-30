@@ -35,3 +35,16 @@ export const payExpenseSchema = z.object({
     ),
   cashAccountId: z.string().uuid("Seleccioná una cuenta"),
 });
+
+export const expenseObligationIdSchema = z
+  .string()
+  .uuid("La obligación es inválida");
+
+export const cancelExpenseObligationSchema = z.object({
+  obligationId: expenseObligationIdSchema,
+  reason: z
+    .string()
+    .trim()
+    .min(3, "Ingresá un motivo de al menos 3 caracteres")
+    .max(500, "El motivo puede tener hasta 500 caracteres"),
+});
