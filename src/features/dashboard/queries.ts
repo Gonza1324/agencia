@@ -1,6 +1,10 @@
 import { cache } from "react";
 
 import { requireInternalUser } from "@/features/auth/guards";
+import {
+  addDaysToDateKey,
+  calculateExpenseForecast,
+} from "@/features/dashboard/expense-forecast";
 import { getArgentinaDateKey, isWorkingDay } from "@/lib/operational-days";
 import { canOperate } from "@/lib/permissions";
 import type { UserRole } from "@/types/domain";
@@ -10,11 +14,12 @@ export const getDailyDashboard = cache(async () => {
   const operationalDate = getArgentinaDateKey(now);
   const workingDay = isWorkingDay(now);
   const { profile, supabase } = await requireInternalUser();
+  const userCanOperate = canOperate(profile.role as UserRole);
+  const expenseHorizonDate = addDaysToDateKey(operationalDate, 7);
 
   let businessDay = null;
 
   if (workingDay) {
-    const userCanOperate = canOperate(profile.role as UserRole);
     const { data, error } = userCanOperate
       ? await supabase.rpc("ensure_current_business_day")
       : await supabase
@@ -34,7 +39,12 @@ export const getDailyDashboard = cache(async () => {
     }
   }
 
-  const [dashboardResult, closureResult] = await Promise.all([
+  const [
+    dashboardResult,
+    closureResult,
+    expensesResult,
+    cashSummaryResult,
+  ] = await Promise.all([
     supabase.rpc("get_subagent_dashboard", { p_date: operationalDate }),
     businessDay
       ? supabase
@@ -45,6 +55,14 @@ export const getDailyDashboard = cache(async () => {
           .eq("business_day_id", businessDay.id)
           .maybeSingle()
       : Promise.resolve({ data: null, error: null }),
+    supabase
+      .from("expense_obligations")
+      .select("id, description, amount, due_date")
+      .eq("status", "pending")
+      .lte("due_date", expenseHorizonDate)
+      .order("due_date")
+      .limit(300),
+    supabase.rpc("get_cash_summary"),
   ]);
 
   if (dashboardResult.error) {
@@ -55,6 +73,10 @@ export const getDailyDashboard = cache(async () => {
 
   if (closureResult.error) {
     throw new Error(`No se pudo cargar el estado del cierre diario.`);
+  }
+
+  if (expensesResult.error || cashSummaryResult.error) {
+    throw new Error("No se pudo calcular la cobertura de gastos.");
   }
 
   const rows = dashboardResult.data;
@@ -73,16 +95,25 @@ export const getDailyDashboard = cache(async () => {
     (total, row) => total + Number(row.received_today),
     0,
   );
+  const availableCash = Number(cashSummaryResult.data[0]?.total_balance ?? 0);
+  const expenseForecast = calculateExpenseForecast(
+    expensesResult.data,
+    availableCash,
+    operationalDate,
+  );
 
   return {
     alertCount,
     businessDay,
     closure: closureResult.data,
+    expenseForecast,
+    expenses: expensesResult.data,
     operationalDate,
     pendingToday,
     receivedToday,
     rows,
     settledToday,
+    userCanOperate,
     workingDay,
   };
 });

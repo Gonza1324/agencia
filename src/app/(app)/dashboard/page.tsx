@@ -1,8 +1,10 @@
 import Link from "next/link";
 import {
   AlertTriangle,
+  CalendarClock,
   CheckCircle2,
   CircleDollarSign,
+  WalletCards,
   UsersRound,
 } from "lucide-react";
 
@@ -175,6 +177,143 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
+      <section
+        className={`rounded-lg border ${
+          dashboard.expenseForecast.canCover
+            ? "bg-card"
+            : "border-red-200 bg-red-50"
+        }`}
+      >
+        <div className="flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 font-semibold">
+              <CalendarClock
+                className="h-5 w-5 text-primary"
+                aria-hidden="true"
+              />
+              Gastos próximos
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Vencidos y compromisos hasta el{" "}
+              {formatDateKey(dashboard.expenseForecast.horizonDate)}.
+            </p>
+          </div>
+          {dashboard.userCanOperate ? (
+            <Link
+              href="/gastos"
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              Administrar gastos
+            </Link>
+          ) : null}
+        </div>
+
+        <div className="grid gap-px bg-border sm:grid-cols-3">
+          <ExpenseMetric
+            label="Vencidos"
+            value={formatMoney(dashboard.expenseForecast.overdueAmount)}
+            helper={`${dashboard.expenseForecast.overdueCount} ${
+              dashboard.expenseForecast.overdueCount === 1
+                ? "obligación"
+                : "obligaciones"
+            }`}
+            danger={dashboard.expenseForecast.overdueCount > 0}
+          />
+          <ExpenseMetric
+            label="Hasta 7 días"
+            value={formatMoney(dashboard.expenseForecast.upcomingAmount)}
+            helper={`${dashboard.expenseForecast.upcomingCount} ${
+              dashboard.expenseForecast.upcomingCount === 1
+                ? "vencimiento"
+                : "vencimientos"
+            }`}
+          />
+          <ExpenseMetric
+            label="Cobertura de Caja"
+            value={
+              dashboard.expenseForecast.canCover
+                ? "Alcanza"
+                : `Faltan ${formatMoney(
+                    Math.abs(
+                      dashboard.expenseForecast.remainingAfterExpenses,
+                    ),
+                  )}`
+            }
+            helper={
+              dashboard.expenseForecast.canCover
+                ? `Quedarían ${formatMoney(
+                    dashboard.expenseForecast.remainingAfterExpenses,
+                  )}`
+                : `Compromisos por ${formatMoney(
+                    dashboard.expenseForecast.requiredAmount,
+                  )}`
+            }
+            danger={!dashboard.expenseForecast.canCover}
+          />
+        </div>
+
+        {dashboard.expenses.length ? (
+          <div className="divide-y">
+            {dashboard.expenses.slice(0, 5).map((expense) => {
+              const isOverdue = expense.due_date < dashboard.operationalDate;
+              const isToday = expense.due_date === dashboard.operationalDate;
+              const content = (
+                <>
+                  <div>
+                    <p className="font-medium">{expense.description}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Vence {formatDateKey(expense.due_date)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge
+                      variant={
+                        isOverdue ? "danger" : isToday ? "warning" : "muted"
+                      }
+                    >
+                      {isOverdue
+                        ? "Vencido"
+                        : isToday
+                          ? "Vence hoy"
+                          : "Próximo"}
+                    </Badge>
+                    <strong>{formatMoney(Number(expense.amount))}</strong>
+                  </div>
+                </>
+              );
+
+              return dashboard.userCanOperate ? (
+                <Link
+                  key={expense.id}
+                  href={`/gastos/${expense.id}/editar`}
+                  className="flex flex-col gap-3 px-5 py-4 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div
+                  key={expense.id}
+                  className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  {content}
+                </div>
+              );
+            })}
+            {dashboard.expenses.length > 5 ? (
+              <p className="px-5 py-3 text-sm text-muted-foreground">
+                Hay {dashboard.expenses.length - 5} obligaciones adicionales
+                dentro del período.
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 px-5 py-5 text-sm text-muted-foreground">
+            <WalletCards className="h-5 w-5" aria-hidden="true" />
+            No hay gastos vencidos ni próximos en los siguientes 7 días.
+          </div>
+        )}
+      </section>
+
       <section className="rounded-lg border bg-card">
         <div className="border-b px-5 py-4">
           <h2 className="font-semibold">Estado de Subagentes</h2>
@@ -262,6 +401,32 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function ExpenseMetric({
+  danger = false,
+  helper,
+  label,
+  value,
+}: {
+  danger?: boolean;
+  helper: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="bg-card px-5 py-4">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p
+        className={`mt-1 text-xl font-semibold ${
+          danger ? "text-destructive" : ""
+        }`}
+      >
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
     </div>
   );
 }

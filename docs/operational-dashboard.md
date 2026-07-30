@@ -34,3 +34,18 @@ Los cálculos se resuelven con la función
 
 El dashboard también muestra si la Caja sigue abierta, fue reabierta o si el
 último cierre registró diferencias, con acceso directo al cierre diario.
+
+## Previsión de gastos
+
+El dashboard muestra las obligaciones vencidas y las que vencen dentro de los
+próximos siete días. Compara la suma de esos compromisos con el saldo total
+vigente de Caja y presenta:
+
+- cantidad e importe vencido;
+- cantidad e importe próximo;
+- saldo estimado luego de cubrir los gastos o faltante de Caja;
+- los cinco vencimientos más cercanos.
+
+La previsión es informativa: no reserva dinero ni modifica los saldos. Los
+usuarios operativos pueden abrir una obligación pendiente desde el dashboard
+para corregirla o gestionarla.

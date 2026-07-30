@@ -93,4 +93,5 @@ Planificación de egresos, vencimientos y pagos conectados con Caja.
 
 Estado: completa. Incluye obligaciones únicas y recurrentes, estados
 pendiente/pagada/cancelada, métricas de vencimientos, edición previa al pago,
-cancelación con motivo y generación transaccional del egreso de Caja.
+cancelación con motivo, generación transaccional del egreso de Caja y
+previsión de cobertura para los próximos siete días en el dashboard.
