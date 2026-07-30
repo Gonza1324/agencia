@@ -49,3 +49,18 @@ vigente de Caja y presenta:
 La previsión es informativa: no reserva dinero ni modifica los saldos. Los
 usuarios operativos pueden abrir una obligación pendiente desde el dashboard
 para corregirla o gestionarla.
+
+## Resumen financiero diario
+
+El bloque `Caja de hoy` concentra:
+
+- saldo actual de efectivo;
+- saldo actual de banco;
+- total disponible;
+- gastos operativos del día;
+- retiros del día;
+- estado y diferencias del último cierre.
+
+Los usuarios operativos tienen accesos rápidos para registrar una rendición,
+crear un movimiento de Caja o abrir las cuentas corrientes. Los visores
+reciben el mismo resumen sin acciones de escritura.

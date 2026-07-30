@@ -95,3 +95,12 @@ Estado: completa. Incluye obligaciones únicas y recurrentes, estados
 pendiente/pagada/cancelada, métricas de vencimientos, edición previa al pago,
 cancelación con motivo, generación transaccional del egreso de Caja y
 previsión de cobertura para los próximos siete días en el dashboard.
+
+## Fase 2.1 — Portal de Subagentes
+
+Acceso externo de solo lectura a máquinas, rendiciones, cuenta corriente y
+saldos propios.
+
+Estado: planificada. La arquitectura de vinculación, RLS, navegación y pruebas
+de aislamiento está definida en `docs/subagent-access.md`. No se habilitará
+escritura externa en la primera entrega.

@@ -1,18 +1,27 @@
 import Link from "next/link";
 import {
   AlertTriangle,
+  Banknote,
   CalendarClock,
   CheckCircle2,
   CircleDollarSign,
+  HandCoins,
+  Landmark,
+  Plus,
+  ReceiptText,
+  Scale,
+  TrendingDown,
   WalletCards,
   UsersRound,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { MetricCard } from "@/components/ui/metric-card";
 import { getDailyDashboard } from "@/features/dashboard/queries";
 import { formatDateKey, formatMoney } from "@/lib/formatters";
 import { getOperationalDateLabel } from "@/lib/operational-days";
+import { cn } from "@/lib/utils";
 
 const statusPresentation: Record<
   string,
@@ -113,6 +122,111 @@ export default async function DashboardPage() {
           value={String(dashboard.alertCount)}
           helper="Sin generar deuda automática"
         />
+      </section>
+
+      <section className="rounded-lg border bg-card">
+        <div className="flex flex-col gap-4 border-b px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="font-semibold">Caja de hoy</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Disponible actual y movimientos del día operativo.
+            </p>
+          </div>
+          {dashboard.userCanOperate ? (
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/rendiciones/nueva"
+                className={cn(buttonVariants({ size: "sm" }))}
+              >
+                <ReceiptText className="h-4 w-4" aria-hidden="true" />
+                Nueva rendición
+              </Link>
+              <Link
+                href="/caja/nuevo"
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "secondary" }),
+                )}
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Movimiento de Caja
+              </Link>
+              <Link
+                href="/subagentes"
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "secondary" }),
+                )}
+              >
+                Cuentas corrientes
+              </Link>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="grid gap-px bg-border sm:grid-cols-2 xl:grid-cols-3">
+          <DailyCashMetric
+            icon={Banknote}
+            label="Efectivo disponible"
+            value={formatMoney(
+              Number(dashboard.cashSummary?.cash_balance ?? 0),
+            )}
+            helper="Saldo actual de Caja física"
+          />
+          <DailyCashMetric
+            icon={Landmark}
+            label="Banco disponible"
+            value={formatMoney(
+              Number(dashboard.cashSummary?.bank_balance ?? 0),
+            )}
+            helper="Saldo bancario registrado"
+          />
+          <DailyCashMetric
+            icon={WalletCards}
+            label="Total disponible"
+            value={formatMoney(
+              Number(dashboard.cashSummary?.total_balance ?? 0),
+            )}
+            helper="Efectivo más banco"
+          />
+          <DailyCashMetric
+            icon={TrendingDown}
+            label="Gastos del día"
+            value={formatMoney(
+              Number(dashboard.dailyFinancial?.total_expense ?? 0),
+            )}
+            helper="Egresos operativos"
+          />
+          <DailyCashMetric
+            icon={HandCoins}
+            label="Retiros del día"
+            value={formatMoney(
+              Number(dashboard.dailyFinancial?.total_withdrawals ?? 0),
+            )}
+            helper="Separados de la ganancia"
+          />
+          <DailyCashMetric
+            icon={Scale}
+            label="Estado del cierre"
+            value={
+              !dashboard.closure
+                ? "Pendiente"
+                : dashboard.closure.status === "reopened"
+                  ? "Reabierto"
+                  : hasClosureDifference
+                    ? "Con diferencias"
+                    : "Correcto"
+            }
+            helper={
+              dashboard.closure
+                ? `Efectivo ${formatMoney(
+                    Number(dashboard.closure.cash_difference ?? 0),
+                  )} · Banco ${formatMoney(
+                    Number(dashboard.closure.bank_difference ?? 0),
+                  )}`
+                : "Se completa al cerrar el día"
+            }
+            danger={hasClosureDifference}
+          />
+        </div>
       </section>
 
       {dashboard.workingDay &&
@@ -428,5 +542,41 @@ function ExpenseMetric({
       </p>
       <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
     </div>
+  );
+}
+
+function DailyCashMetric({
+  danger = false,
+  helper,
+  icon: Icon,
+  label,
+  value,
+}: {
+  danger?: boolean;
+  helper: string;
+  icon: typeof Banknote;
+  label: string;
+  value: string;
+}) {
+  return (
+    <article className="bg-card px-5 py-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <p
+            className={cn(
+              "mt-1 text-xl font-semibold",
+              danger && "text-destructive",
+            )}
+          >
+            {value}
+          </p>
+        </div>
+        <div className="rounded-md bg-muted p-2 text-primary">
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </div>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">{helper}</p>
+    </article>
   );
 }

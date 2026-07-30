@@ -44,6 +44,7 @@ export const getDailyDashboard = cache(async () => {
     closureResult,
     expensesResult,
     cashSummaryResult,
+    dailyReportResult,
   ] = await Promise.all([
     supabase.rpc("get_subagent_dashboard", { p_date: operationalDate }),
     businessDay
@@ -63,6 +64,9 @@ export const getDailyDashboard = cache(async () => {
       .order("due_date")
       .limit(300),
     supabase.rpc("get_cash_summary"),
+    supabase.rpc("get_daily_report", {
+      p_date: operationalDate,
+    }),
   ]);
 
   if (dashboardResult.error) {
@@ -75,8 +79,12 @@ export const getDailyDashboard = cache(async () => {
     throw new Error(`No se pudo cargar el estado del cierre diario.`);
   }
 
-  if (expensesResult.error || cashSummaryResult.error) {
-    throw new Error("No se pudo calcular la cobertura de gastos.");
+  if (
+    expensesResult.error ||
+    cashSummaryResult.error ||
+    dailyReportResult.error
+  ) {
+    throw new Error("No se pudo calcular el resumen financiero diario.");
   }
 
   const rows = dashboardResult.data;
@@ -95,7 +103,9 @@ export const getDailyDashboard = cache(async () => {
     (total, row) => total + Number(row.received_today),
     0,
   );
-  const availableCash = Number(cashSummaryResult.data[0]?.total_balance ?? 0);
+  const cashSummary = cashSummaryResult.data[0];
+  const dailyFinancial = dailyReportResult.data[0];
+  const availableCash = Number(cashSummary?.total_balance ?? 0);
   const expenseForecast = calculateExpenseForecast(
     expensesResult.data,
     availableCash,
@@ -105,7 +115,9 @@ export const getDailyDashboard = cache(async () => {
   return {
     alertCount,
     businessDay,
+    cashSummary,
     closure: closureResult.data,
+    dailyFinancial,
     expenseForecast,
     expenses: expensesResult.data,
     operationalDate,
