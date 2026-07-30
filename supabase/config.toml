@@ -3,7 +3,7 @@ project_id = "loteria-control"
 [api]
 enabled = true
 port = 54321
-schemas = ["public"]
+schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
@@ -18,7 +18,24 @@ port = 54323
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000"]
+site_url = "https://control-agencia.vercel.app"
+additional_redirect_urls = [
+  "https://control-agencia.vercel.app/actualizar-clave",
+  "http://localhost:3000",
+  "http://localhost:3000/actualizar-clave",
+]
 jwt_expiry = 3600
-enable_signup = false
+enable_signup = true
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = false
+max_frequency = "1m0s"
+otp_length = 8
+otp_expiry = 3600
