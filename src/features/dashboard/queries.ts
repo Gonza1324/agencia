@@ -25,17 +25,30 @@ export const getDailyDashboard = cache(async () => {
     }
   }
 
-  const { data: rows, error: dashboardError } = await supabase.rpc(
-    "get_subagent_dashboard",
-    { p_date: operationalDate },
-  );
+  const [dashboardResult, closureResult] = await Promise.all([
+    supabase.rpc("get_subagent_dashboard", { p_date: operationalDate }),
+    businessDay
+      ? supabase
+          .from("cash_closures")
+          .select(
+            "id, status, cash_difference, bank_difference, closed_at, reopened_at",
+          )
+          .eq("business_day_id", businessDay.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
 
-  if (dashboardError) {
+  if (dashboardResult.error) {
     throw new Error(
-      `No se pudo cargar el dashboard: ${dashboardError.message}`,
+      `No se pudo cargar el dashboard: ${dashboardResult.error.message}`,
     );
   }
 
+  if (closureResult.error) {
+    throw new Error(`No se pudo cargar el estado del cierre diario.`);
+  }
+
+  const rows = dashboardResult.data;
   const settledToday = rows.filter(
     (row) =>
       row.dashboard_status === "settled" ||
@@ -55,6 +68,7 @@ export const getDailyDashboard = cache(async () => {
   return {
     alertCount,
     businessDay,
+    closure: closureResult.data,
     operationalDate,
     pendingToday,
     receivedToday,

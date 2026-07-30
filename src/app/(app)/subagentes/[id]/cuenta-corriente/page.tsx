@@ -80,8 +80,9 @@ export default async function SubagentAccountPage({
           className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           role="alert"
         >
-          No se pudo anular el movimiento. Verificá el motivo y que la anulación
-          no genere saldo a favor.
+          {notices.voidError === "closed"
+            ? "El día operativo está cerrado. Reabrilo antes de anular el movimiento."
+            : "No se pudo anular el movimiento. Verificá el motivo y que la anulación no genere saldo a favor."}
         </p>
       ) : null}
 

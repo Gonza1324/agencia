@@ -59,6 +59,10 @@ compensaciones, prevención de adelantos y anulaciones auditadas.
 
 Cierre, diferencias, nota obligatoria y reapertura auditada.
 
+Estado: completa. Incluye resumen y arqueo por fecha, efectivo y banco esperado
+contra informado, notas obligatorias ante diferencias, bloqueo de operaciones
+en días cerrados y reapertura con motivo y auditoría.
+
 ## Fase 1.9 — Reportes
 
 Reportes diarios, semanales y mensuales básicos.

@@ -57,6 +57,9 @@ export default async function DashboardPage() {
   const alertRows = dashboard.rows.filter((row) =>
     ["late", "late_serious", "late_critical"].includes(row.dashboard_status),
   );
+  const hasClosureDifference =
+    Number(dashboard.closure?.cash_difference ?? 0) !== 0 ||
+    Number(dashboard.closure?.bank_difference ?? 0) !== 0;
 
   return (
     <div className="space-y-6">
@@ -109,6 +112,40 @@ export default async function DashboardPage() {
           helper="Sin generar deuda automática"
         />
       </section>
+
+      {dashboard.workingDay &&
+      (dashboard.businessDay?.status !== "closed" || hasClosureDifference) ? (
+        <section
+          className={`rounded-lg border p-5 ${
+            hasClosureDifference
+              ? "border-red-200 bg-red-50"
+              : "border-amber-200 bg-amber-50"
+          }`}
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-semibold">
+                {hasClosureDifference
+                  ? "El cierre tiene diferencias"
+                  : dashboard.businessDay?.status === "reopened"
+                    ? "La Caja fue reabierta"
+                    : "La Caja todavía está abierta"}
+              </h2>
+              <p className="mt-1 text-sm">
+                {hasClosureDifference
+                  ? `Efectivo: ${formatMoney(Number(dashboard.closure?.cash_difference ?? 0))} · Banco: ${formatMoney(Number(dashboard.closure?.bank_difference ?? 0))}`
+                  : "Revisá el arqueo y cerrá el día cuando termine la operación."}
+              </p>
+            </div>
+            <Link
+              href="/cierre-diario"
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              Ir al cierre diario
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       {alertRows.length ? (
         <section className="rounded-lg border border-orange-200 bg-orange-50 p-5">

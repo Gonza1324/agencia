@@ -53,9 +53,11 @@ export async function createCashMovementAction(
   if (error) {
     return {
       status: "error",
-      message: error.message.includes("saldo")
-        ? "El saldo de la cuenta es insuficiente."
-        : "No se pudo registrar el movimiento.",
+      message: error.message.includes("día operativo está cerrado")
+        ? "El día operativo está cerrado. Reabrilo antes de registrar movimientos."
+        : error.message.includes("saldo")
+          ? "El saldo de la cuenta es insuficiente."
+          : "No se pudo registrar el movimiento.",
     };
   }
 

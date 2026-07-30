@@ -50,6 +50,10 @@ function getMutationMessage(code?: string, message?: string) {
     return "El importe recibido no puede superar el importe esperado.";
   }
 
+  if (message?.includes("día operativo está cerrado")) {
+    return "El día operativo está cerrado. Reabrilo antes de modificar rendiciones.";
+  }
+
   return "No se pudo guardar la rendición. Intentá nuevamente.";
 }
 
@@ -146,7 +150,7 @@ export async function voidSettlementAction(
   if (error) {
     return {
       status: "error",
-      message: "No se pudo anular la rendición.",
+      message: getMutationMessage(error.code, error.message),
     };
   }
 

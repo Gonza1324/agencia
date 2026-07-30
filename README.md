@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.7 — Cuenta corriente de Subagentes.
+Fase 1.8 — Cierre diario.
 
 La base incluye:
 
@@ -38,6 +38,10 @@ La base incluye:
 - Pagos de deuda parciales o totales conectados con Caja.
 - Ajustes, compensaciones y anulaciones con motivo y auditoría.
 - Prevención transaccional de adelantos y saldos a favor.
+- Arqueo diario de efectivo y banco contra saldos esperados.
+- Nota obligatoria ante diferencias de cierre.
+- Bloqueo de operaciones en días cerrados.
+- Reapertura con motivo y auditoría.
 
 ## Requisitos
 
@@ -107,6 +111,5 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.8: cierre diario.
-2. Fase 1.9: reportes.
-3. Fase 1.10: pulido, tests y documentación final.
+1. Fase 1.9: reportes.
+2. Fase 1.10: pulido, tests y documentación final.

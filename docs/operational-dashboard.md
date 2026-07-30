@@ -31,3 +31,6 @@ La fecha operativa se determina siempre con la zona horaria
 Los cálculos se resuelven con la función
 `public.get_subagent_dashboard(date)`. El día actual se asegura mediante
 `public.ensure_current_business_day()`.
+
+El dashboard también muestra si la Caja sigue abierta, fue reabierta o si el
+último cierre registró diferencias, con acceso directo al cierre diario.

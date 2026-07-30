@@ -32,6 +32,8 @@ La base está diseñada para Supabase/PostgreSQL con RLS desde el inicio.
 - El saldo de cada Subagente se deriva de débitos y créditos activos. Los pagos
   de deuda crean su ingreso de Caja en la misma transacción y nunca pueden
   generar saldo a favor.
+- El cierre diario guarda una instantánea del arqueo. El estado de
+  `business_days` bloquea escrituras operativas hasta una reapertura auditada.
 - Rendiciones anuladas no bloquean una nueva rendición para la misma fecha.
 - Deuda monetaria solo existe cuando se cargó `expected_amount`.
 - RLS inicial permite gestión completa solo a `owner_admin`.

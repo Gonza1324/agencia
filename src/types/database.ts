@@ -802,6 +802,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      close_business_day: {
+        Args: {
+          p_business_date: string;
+          p_counted_cash_amount: number;
+          p_note?: string | null;
+          p_reported_bank_amount: number;
+        };
+        Returns: string;
+      };
       create_subagent_account_movement: {
         Args: {
           p_amount: number;
@@ -856,6 +865,20 @@ export type Database = {
           total_balance: number;
         }[];
       };
+      get_daily_closure_summary: {
+        Args: { p_business_date: string };
+        Returns: {
+          business_day_id: string | null;
+          business_day_status:
+            Database["public"]["Enums"]["business_day_status"] | null;
+          expected_bank_amount: number;
+          expected_cash_amount: number;
+          total_available: number;
+          total_expense: number;
+          total_income: number;
+          total_withdrawals: number;
+        }[];
+      };
       get_subagent_account_summary: {
         Args: { p_subagent_id: string };
         Returns: {
@@ -881,6 +904,10 @@ export type Database = {
         }[];
       };
       is_owner_admin: { Args: never; Returns: boolean };
+      reopen_business_day: {
+        Args: { p_business_date: string; p_reason: string };
+        Returns: string;
+      };
       replace_daily_settlement: {
         Args: {
           p_bank_amount: number;

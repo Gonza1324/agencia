@@ -47,9 +47,11 @@ export async function createSubagentAccountMovementAction(
   if (error) {
     return {
       status: "error",
-      message: error.message.includes("supera la deuda")
-        ? "El importe supera la deuda vigente. No se permiten adelantos."
-        : "No se pudo registrar el movimiento.",
+      message: error.message.includes("día operativo está cerrado")
+        ? "El día operativo está cerrado. Reabrilo antes de registrar movimientos."
+        : error.message.includes("supera la deuda")
+          ? "El importe supera la deuda vigente. No se permiten adelantos."
+          : "No se pudo registrar el movimiento.",
     };
   }
 
@@ -82,7 +84,11 @@ export async function voidSubagentAccountMovementAction(formData: FormData) {
 
   if (error) {
     redirect(
-      `/subagentes/${subagentId.data}/cuenta-corriente?voidError=operation`,
+      `/subagentes/${subagentId.data}/cuenta-corriente?voidError=${
+        error.message.includes("día operativo está cerrado")
+          ? "closed"
+          : "operation"
+      }`,
     );
   }
 
