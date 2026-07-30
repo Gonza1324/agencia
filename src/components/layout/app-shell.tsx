@@ -1,9 +1,10 @@
-import { LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 
 import {
   DesktopNavigation,
   MobileNavigation,
 } from "@/components/layout/app-navigation";
+import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions";
 
 type AppShellProps = {
@@ -21,7 +22,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
       >
         Ir al contenido
       </a>
-      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r bg-card px-4 py-5 lg:block">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r bg-card px-4 py-5 lg:flex">
         <div className="mb-8">
           <p className="text-xs font-semibold uppercase text-primary">
             Control Agencia
@@ -30,38 +31,42 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
             Caja y subagentes
           </p>
         </div>
-        <DesktopNavigation />
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <DesktopNavigation />
+        </div>
+
+        <div className="mt-4 rounded-xl border bg-muted/40 p-3 shadow-sm">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <UserRound className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold">
+                {userName ?? "Propietario"}
+              </p>
+              <p
+                className="truncate text-xs text-muted-foreground"
+                title={userEmail}
+              >
+                {userEmail}
+              </p>
+            </div>
+          </div>
+          <form action={logoutAction} className="mt-3">
+            <Button
+              className="w-full"
+              type="submit"
+              variant="secondary"
+              size="sm"
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              Salir
+            </Button>
+          </form>
+        </div>
       </aside>
 
       <div className="lg:pl-64">
-        <header className="sticky top-0 z-10 border-b bg-card/95 px-4 py-3 backdrop-blur md:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div className="lg:hidden">
-              <p className="text-sm font-semibold text-primary">
-                Control Agencia
-              </p>
-            </div>
-            <div className="ml-auto flex items-center gap-3">
-              <div className="min-w-0 text-right">
-                <p className="text-sm font-medium">
-                  {userName ?? "Propietario"}
-                </p>
-                <p className="hidden max-w-52 truncate text-xs text-muted-foreground sm:block">
-                  {userEmail}
-                </p>
-              </div>
-              <form action={logoutAction}>
-                <button
-                  className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium transition hover:bg-muted"
-                  type="submit"
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">Salir</span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </header>
         <main
           id="contenido-principal"
           className="px-4 py-6 pb-24 md:px-8 lg:pb-8"
@@ -69,7 +74,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
           {children}
         </main>
       </div>
-      <MobileNavigation />
+      <MobileNavigation logoutAction={logoutAction} />
     </div>
   );
 }

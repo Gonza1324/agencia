@@ -7,6 +7,7 @@ import {
   BarChart3,
   CalendarCheck,
   LayoutDashboard,
+  LogOut,
   ReceiptText,
   Settings,
   UsersRound,
@@ -59,7 +60,11 @@ export function DesktopNavigation() {
   );
 }
 
-export function MobileNavigation() {
+type MobileNavigationProps = {
+  logoutAction: () => Promise<void>;
+};
+
+export function MobileNavigation({ logoutAction }: MobileNavigationProps) {
   const pathname = usePathname();
 
   return (
@@ -87,6 +92,15 @@ export function MobileNavigation() {
             </Link>
           );
         })}
+        <form action={logoutAction} className="flex min-w-[76px] flex-1">
+          <button
+            type="submit"
+            className="flex w-full flex-col items-center gap-1 px-2 py-2 text-[11px] font-medium text-muted-foreground"
+          >
+            <LogOut className="h-5 w-5" aria-hidden="true" />
+            <span>Salir</span>
+          </button>
+        </form>
       </div>
     </nav>
   );
