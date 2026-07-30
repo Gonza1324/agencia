@@ -1,6 +1,12 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  canAccessInternalApp,
+  canManageSensitiveOperation,
+  canOperate,
+} from "@/lib/permissions";
+import type { UserRole } from "@/types/domain";
 
-export async function requireOwnerAdmin() {
+async function requireProfile() {
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
@@ -13,20 +19,47 @@ export async function requireOwnerAdmin() {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role, status")
+    .select("full_name, role, status")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (
-    profileError ||
-    profile?.role !== "owner_admin" ||
-    profile.status !== "active"
-  ) {
-    throw new Error("OWNER_ADMIN_REQUIRED");
+  if (profileError || !profile || profile.status !== "active") {
+    throw new Error("ACTIVE_PROFILE_REQUIRED");
   }
 
   return {
+    profile,
     supabase,
     user,
   };
+}
+
+export async function requireInternalUser() {
+  const context = await requireProfile();
+
+  if (!canAccessInternalApp(context.profile.role as UserRole)) {
+    throw new Error("INTERNAL_USER_REQUIRED");
+  }
+
+  return context;
+}
+
+export async function requireOperator() {
+  const context = await requireProfile();
+
+  if (!canOperate(context.profile.role as UserRole)) {
+    throw new Error("OPERATOR_REQUIRED");
+  }
+
+  return context;
+}
+
+export async function requireOwnerAdmin() {
+  const context = await requireProfile();
+
+  if (!canManageSensitiveOperation(context.profile.role as UserRole)) {
+    throw new Error("OWNER_ADMIN_REQUIRED");
+  }
+
+  return context;
 }

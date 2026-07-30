@@ -24,8 +24,12 @@ Producción requiere:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY` debe configurarse como variable sensible únicamente
+en Vercel. No debe llevar el prefijo `NEXT_PUBLIC_`.
 
 No se usa `service_role` en la aplicación. Los permisos se resuelven mediante
 Supabase Auth, perfiles y RLS.

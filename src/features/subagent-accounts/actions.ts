@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import type { SubagentAccountFormState } from "@/features/subagent-accounts/state";
 import {
   subagentAccountIdSchema,
@@ -31,7 +31,7 @@ export async function createSubagentAccountMovementAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data: id, error } = await supabase.rpc(
     "create_subagent_account_movement",
     {
@@ -76,7 +76,7 @@ export async function voidSubagentAccountMovementAction(formData: FormData) {
     );
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { error } = await supabase.rpc("void_subagent_account_movement", {
     p_movement_id: movementId.data,
     p_reason: reason,

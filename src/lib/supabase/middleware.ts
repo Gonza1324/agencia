@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { hasPublicSupabaseEnv } from "@/lib/env";
+import { canAccessInternalApp } from "@/lib/permissions";
 import type { CookieOptions } from "@supabase/ssr";
 import type { Database } from "@/types/database";
+import type { UserRole } from "@/types/domain";
 
 const publicRoutes = ["/login"];
 
@@ -59,7 +61,7 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname === route ||
       request.nextUrl.pathname.startsWith(`${route}/`),
   );
-  let isOwnerAdmin = false;
+  let activeRole: UserRole | null = null;
 
   if (user) {
     const { data: profile } = await supabase
@@ -68,11 +70,15 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .maybeSingle();
 
-    isOwnerAdmin =
-      profile?.role === "owner_admin" && profile.status === "active";
+    if (
+      profile?.status === "active" &&
+      canAccessInternalApp(profile.role as UserRole)
+    ) {
+      activeRole = profile.role as UserRole;
+    }
   }
 
-  if ((!user || !isOwnerAdmin) && !isPublicRoute) {
+  if ((!user || !activeRole) && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     if (user) {
@@ -81,9 +87,26 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (user && isOwnerAdmin && request.nextUrl.pathname === "/login") {
+  if (user && activeRole && request.nextUrl.pathname === "/login") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/dashboard";
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  const pathname = request.nextUrl.pathname;
+  const isViewerRoute =
+    pathname === "/" ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/reportes");
+  const isOwnerRoute = pathname.startsWith("/configuracion");
+
+  if (
+    (activeRole === "viewer" && !isViewerRoute) ||
+    (activeRole === "cash_operator" && isOwnerRoute)
+  ) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/dashboard";
+    redirectUrl.searchParams.set("reason", "forbidden");
     return NextResponse.redirect(redirectUrl);
   }
 

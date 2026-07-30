@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     reason === "unauthorized"
       ? {
           status: "error",
-          message: "Tu usuario no tiene acceso de propietario activo.",
+          message: "Tu usuario no tiene acceso interno activo.",
         }
       : initialLoginState;
 

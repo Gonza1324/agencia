@@ -1,6 +1,6 @@
 import { cache } from "react";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import { subagentAccountIdSchema } from "@/features/subagent-accounts/validations";
 
 export const getSubagentAccountSummary = cache(async (subagentId: string) => {
@@ -10,7 +10,7 @@ export const getSubagentAccountSummary = cache(async (subagentId: string) => {
     return null;
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase.rpc("get_subagent_account_summary", {
     p_subagent_id: parsedId.data,
   });
@@ -29,7 +29,7 @@ export const getSubagentAccountPageData = cache(async (subagentId: string) => {
     return null;
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const [subagentResult, summaryResult, movementsResult, accountsResult] =
     await Promise.all([
       supabase

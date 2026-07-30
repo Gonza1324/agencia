@@ -1,9 +1,9 @@
 import { cache } from "react";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 
 export const getCashPageData = cache(async () => {
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const [summaryResult, movementsResult, accountsResult, categoriesResult] =
     await Promise.all([
       supabase.rpc("get_cash_summary"),
@@ -50,7 +50,7 @@ export const getCashPageData = cache(async () => {
 });
 
 export const getCashCategories = cache(async () => {
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("cash_categories")
     .select("*")

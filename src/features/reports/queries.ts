@@ -1,6 +1,6 @@
 import { cache } from "react";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireInternalUser } from "@/features/auth/guards";
 import { getReportRange } from "@/features/reports/date-ranges";
 import {
   reportDateSchema,
@@ -22,7 +22,7 @@ export const getReportsData = cache(
       from: rawRange.from,
       to: rawRange.to > today ? today : rawRange.to,
     };
-    const { supabase } = await requireOwnerAdmin();
+    const { supabase } = await requireInternalUser();
 
     if (view === "daily") {
       const [reportResult, closureResult] = await Promise.all([

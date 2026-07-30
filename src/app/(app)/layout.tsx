@@ -13,13 +13,17 @@ export default async function AppLayout({
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, role")
         .eq("id", user.id)
         .maybeSingle()
     : { data: null };
 
   return (
-    <AppShell userEmail={user?.email} userName={profile?.full_name}>
+    <AppShell
+      userEmail={user?.email}
+      userName={profile?.full_name}
+      userRole={profile?.role ?? "viewer"}
+    >
       {children}
     </AppShell>
   );

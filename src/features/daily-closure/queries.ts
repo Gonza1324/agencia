@@ -1,6 +1,6 @@
 import { cache } from "react";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import { closureDateSchema } from "@/features/daily-closure/validations";
 import { getArgentinaDateKey } from "@/lib/operational-days";
 
@@ -9,7 +9,7 @@ export const getDailyClosureData = cache(async (requestedDate?: string) => {
   const businessDate = parsedDate.success
     ? parsedDate.data
     : getArgentinaDateKey();
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const [summaryResult, closureResult] = await Promise.all([
     supabase.rpc("get_daily_closure_summary", {
       p_business_date: businessDate,

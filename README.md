@@ -50,6 +50,8 @@ La base incluye:
 - Confirmaciones para operaciones sensibles.
 - Tests automatizados de reglas de negocio.
 - Cabeceras de seguridad y endpoint de salud.
+- Administración interna de usuarios, contraseñas temporales y estados.
+- Roles efectivos de propietario, operador y visor con RLS.
 
 ## Requisitos
 
@@ -65,11 +67,13 @@ Copiar `.env.example` a `.env.local` y completar:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` acepta la clave publicable moderna del
-proyecto. La aplicación no necesita una clave `service_role`.
+proyecto. `SUPABASE_SERVICE_ROLE_KEY` se usa exclusivamente en el servidor para
+administrar accesos y nunca debe exponerse al navegador ni guardarse en Git.
 
 ## Comandos
 
@@ -118,6 +122,9 @@ Después de crear usuarios en Supabase Auth, crear su perfil en
 
 El procedimiento seguro y la consulta de bootstrap están documentados en
 [`docs/auth.md`](docs/auth.md).
+
+La matriz de permisos y la administración desde la aplicación están
+documentadas en [`docs/users-and-roles.md`](docs/users-and-roles.md).
 
 ## Producción
 

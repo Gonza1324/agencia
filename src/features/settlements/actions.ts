@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import type { SettlementFormState } from "@/features/settlements/state";
 import {
   settlementIdSchema,
@@ -71,7 +71,7 @@ export async function createSettlementAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data: id, error } = await supabase.rpc(
     "create_daily_settlement",
     getRpcArgs(parsed.data),
@@ -106,7 +106,7 @@ export async function updateSettlementAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data: id, error } = await supabase.rpc("replace_daily_settlement", {
     p_previous_settlement_id: parsedId.data,
     ...getRpcArgs(parsed.data),
@@ -141,7 +141,7 @@ export async function voidSettlementAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { error } = await supabase.rpc("void_daily_settlement", {
     p_settlement_id: parsed.data.id,
     p_reason: parsed.data.reason,

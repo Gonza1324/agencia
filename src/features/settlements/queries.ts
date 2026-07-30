@@ -1,10 +1,10 @@
 import { cache } from "react";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import { settlementIdSchema } from "@/features/settlements/validations";
 
 export const getSettlements = cache(async () => {
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("daily_settlements")
     .select(
@@ -28,7 +28,7 @@ export const getSettlementById = cache(async (id: string) => {
     return null;
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("daily_settlements")
     .select(
@@ -45,7 +45,7 @@ export const getSettlementById = cache(async (id: string) => {
 });
 
 export const getActiveSubagentsForSettlement = cache(async () => {
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("subagents")
     .select("id, name, machine_code")

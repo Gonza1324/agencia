@@ -78,3 +78,11 @@ Responsive, estados vacíos, errores, confirmaciones, tests y documentación fin
 Estado: completa. Incluye navegación móvil, estado activo accesible, pantallas
 globales de carga/error/404, confirmaciones para acciones sensibles, cabeceras
 de seguridad, endpoint de salud y suite automatizada de reglas de negocio.
+
+## Fase 1.11 — Usuarios y roles
+
+Administración interna de accesos, roles efectivos y estados.
+
+Estado: completa. Incluye altas con contraseña temporal, cambios de nombre,
+rol y estado, restablecimiento de contraseña, auditoría, navegación por rol y
+políticas RLS diferenciadas para propietarios, operadores y visores.

@@ -1,12 +1,12 @@
 import { cache } from "react";
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import { subagentIdSchema } from "@/features/subagents/validations";
 import type { Tables } from "@/types/database";
 
 export type Subagent = Tables<"subagents">;
 
 export const getSubagents = cache(async () => {
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("subagents")
     .select("*")
@@ -27,7 +27,7 @@ export const getSubagentById = cache(async (id: string) => {
     return null;
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("subagents")
     .select("*")
@@ -48,7 +48,7 @@ export const getSubagentAuditLog = cache(async (id: string) => {
     return [];
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data, error } = await supabase
     .from("audit_logs")
     .select("id, action, created_at, old_values, new_values")

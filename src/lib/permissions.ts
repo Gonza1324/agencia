@@ -1,7 +1,21 @@
 import type { UserRole } from "@/types/domain";
 
-const sensitiveRoles: UserRole[] = ["owner_admin"];
+export const internalUserRoles: UserRole[] = [
+  "owner_admin",
+  "cash_operator",
+  "viewer",
+];
+
+export const operatorRoles: UserRole[] = ["owner_admin", "cash_operator"];
 
 export function canManageSensitiveOperation(role: UserRole) {
-  return sensitiveRoles.includes(role);
+  return role === "owner_admin";
+}
+
+export function canOperate(role: UserRole) {
+  return operatorRoles.includes(role);
+}
+
+export function canAccessInternalApp(role: UserRole) {
+  return internalUserRoles.includes(role);
 }

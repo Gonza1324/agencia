@@ -1,18 +1,27 @@
 import { cache } from "react";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireInternalUser } from "@/features/auth/guards";
 import { getArgentinaDateKey, isWorkingDay } from "@/lib/operational-days";
+import { canOperate } from "@/lib/permissions";
+import type { UserRole } from "@/types/domain";
 
 export const getDailyDashboard = cache(async () => {
   const now = new Date();
   const operationalDate = getArgentinaDateKey(now);
   const workingDay = isWorkingDay(now);
-  const { supabase } = await requireOwnerAdmin();
+  const { profile, supabase } = await requireInternalUser();
 
   let businessDay = null;
 
   if (workingDay) {
-    const { data, error } = await supabase.rpc("ensure_current_business_day");
+    const userCanOperate = canOperate(profile.role as UserRole);
+    const { data, error } = userCanOperate
+      ? await supabase.rpc("ensure_current_business_day")
+      : await supabase
+          .from("business_days")
+          .select("*")
+          .eq("date", operationalDate)
+          .limit(1);
 
     if (error) {
       throw new Error(`No se pudo abrir el día operativo: ${error.message}`);
@@ -20,7 +29,7 @@ export const getDailyDashboard = cache(async () => {
 
     businessDay = data[0] ?? null;
 
-    if (!businessDay) {
+    if (!businessDay && userCanOperate) {
       throw new Error("No se pudo obtener el día operativo actual.");
     }
   }

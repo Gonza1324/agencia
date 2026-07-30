@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import {
+  requireOperator,
+  requireOwnerAdmin,
+} from "@/features/auth/guards";
 import type { CashFormState } from "@/features/cash/state";
 import {
   cashCategorySchema,
@@ -34,7 +37,7 @@ export async function createCashMovementAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data: id, error } = await supabase.rpc(
     "create_manual_cash_movement",
     {

@@ -802,37 +802,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      can_manage_users: { Args: never; Returns: boolean };
+      can_operate: { Args: never; Returns: boolean };
       close_business_day: {
         Args: {
           p_business_date: string;
           p_counted_cash_amount: number;
           p_note?: string | null;
           p_reported_bank_amount: number;
-        };
-        Returns: string;
-      };
-      create_subagent_account_movement: {
-        Args: {
-          p_amount: number;
-          p_business_date: string;
-          p_cash_account_id?: string | null;
-          p_notes?: string | null;
-          p_subagent_id: string;
-          p_type: Database["public"]["Enums"]["account_movement_type"];
-        };
-        Returns: string;
-      };
-      create_manual_cash_movement: {
-        Args: {
-          p_amount: number;
-          p_business_date: string;
-          p_cash_account_id: string;
-          p_category_id: string | null;
-          p_description?: string | null;
-          p_direction: Database["public"]["Enums"]["cash_movement_direction"];
-          p_note?: string | null;
-          p_owner_name?: string | null;
-          p_type: Database["public"]["Enums"]["cash_movement_type"];
         };
         Returns: string;
       };
@@ -850,9 +827,54 @@ export type Database = {
         };
         Returns: string;
       };
+      create_manual_cash_movement: {
+        Args: {
+          p_amount: number;
+          p_business_date: string;
+          p_cash_account_id: string;
+          p_category_id: string | null;
+          p_description?: string | null;
+          p_direction: Database["public"]["Enums"]["cash_movement_direction"];
+          p_note?: string | null;
+          p_owner_name?: string | null;
+          p_type: Database["public"]["Enums"]["cash_movement_type"];
+        };
+        Returns: string;
+      };
+      create_subagent_account_movement: {
+        Args: {
+          p_amount: number;
+          p_business_date: string;
+          p_cash_account_id?: string | null;
+          p_notes?: string | null;
+          p_subagent_id: string;
+          p_type: Database["public"]["Enums"]["account_movement_type"];
+        };
+        Returns: string;
+      };
       ensure_current_business_day: {
         Args: never;
-        Returns: Database["public"]["Tables"]["business_days"]["Row"][];
+        Returns: {
+          closed_at: string | null;
+          closed_by: string | null;
+          created_at: string;
+          date: string;
+          id: string;
+          is_working_day: boolean;
+          opened_at: string | null;
+          opened_by: string | null;
+          reopen_reason: string | null;
+          reopened_at: string | null;
+          reopened_by: string | null;
+          status: Database["public"]["Enums"]["business_day_status"];
+          updated_at: string;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "business_days";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
       };
       get_cash_summary: {
         Args: never;
@@ -868,9 +890,8 @@ export type Database = {
       get_daily_closure_summary: {
         Args: { p_business_date: string };
         Returns: {
-          business_day_id: string | null;
-          business_day_status:
-            Database["public"]["Enums"]["business_day_status"] | null;
+          business_day_id: string;
+          business_day_status: Database["public"]["Enums"]["business_day_status"];
           expected_bank_amount: number;
           expected_cash_amount: number;
           total_available: number;
@@ -959,14 +980,15 @@ export type Database = {
           debt_today: number;
           delay_days: number;
           known_balance: number;
-          last_settlement_date: string | null;
+          last_settlement_date: string;
           machine_code: string;
           received_today: number;
           subagent_id: string;
           subagent_name: string;
-          today_settlement_id: string | null;
+          today_settlement_id: string;
         }[];
       };
+      is_internal_user: { Args: never; Returns: boolean };
       is_owner_admin: { Args: never; Returns: boolean };
       reopen_business_day: {
         Args: { p_business_date: string; p_reason: string };

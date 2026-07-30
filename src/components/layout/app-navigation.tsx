@@ -15,6 +15,7 @@ import {
 
 import { navigationItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
+import type { UserRole } from "@/types/domain";
 
 const iconMap = {
   dashboard: LayoutDashboard,
@@ -30,12 +31,15 @@ function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function DesktopNavigation() {
+export function DesktopNavigation({ userRole }: { userRole: UserRole }) {
   const pathname = usePathname();
+  const visibleItems = navigationItems.filter((item) =>
+    (item.roles as readonly UserRole[]).includes(userRole),
+  );
 
   return (
     <nav className="space-y-1" aria-label="Navegación principal">
-      {navigationItems.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = iconMap[item.icon];
         const active = isActivePath(pathname, item.href);
 
@@ -62,10 +66,17 @@ export function DesktopNavigation() {
 
 type MobileNavigationProps = {
   logoutAction: () => Promise<void>;
+  userRole: UserRole;
 };
 
-export function MobileNavigation({ logoutAction }: MobileNavigationProps) {
+export function MobileNavigation({
+  logoutAction,
+  userRole,
+}: MobileNavigationProps) {
   const pathname = usePathname();
+  const visibleItems = navigationItems.filter((item) =>
+    (item.roles as readonly UserRole[]).includes(userRole),
+  );
 
   return (
     <nav
@@ -73,7 +84,7 @@ export function MobileNavigation({ logoutAction }: MobileNavigationProps) {
       aria-label="Navegación móvil"
     >
       <div className="flex overflow-x-auto px-2">
-        {navigationItems.map((item) => {
+        {visibleItems.map((item) => {
           const Icon = iconMap[item.icon];
           const active = isActivePath(pathname, item.href);
 

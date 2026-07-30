@@ -6,14 +6,28 @@ import {
 } from "@/components/layout/app-navigation";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions";
+import type { UserRole } from "@/types/domain";
 
 type AppShellProps = {
   children: React.ReactNode;
   userEmail?: string;
   userName?: string;
+  userRole: UserRole;
 };
 
-export function AppShell({ children, userEmail, userName }: AppShellProps) {
+const roleLabels: Record<UserRole, string> = {
+  owner_admin: "Propietario",
+  cash_operator: "Operador",
+  viewer: "Visor",
+  subagent: "Subagente",
+};
+
+export function AppShell({
+  children,
+  userEmail,
+  userName,
+  userRole,
+}: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
       <a
@@ -32,7 +46,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
           </p>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <DesktopNavigation />
+          <DesktopNavigation userRole={userRole} />
         </div>
 
         <div className="mt-4 rounded-xl border bg-muted/40 p-3 shadow-sm">
@@ -43,6 +57,9 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold">
                 {userName ?? "Propietario"}
+              </p>
+              <p className="text-[11px] font-medium text-primary">
+                {roleLabels[userRole]}
               </p>
               <p
                 className="truncate text-xs text-muted-foreground"
@@ -74,7 +91,7 @@ export function AppShell({ children, userEmail, userName }: AppShellProps) {
           {children}
         </main>
       </div>
-      <MobileNavigation logoutAction={logoutAction} />
+      <MobileNavigation logoutAction={logoutAction} userRole={userRole} />
     </div>
   );
 }

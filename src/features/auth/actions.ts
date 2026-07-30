@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import type { LoginState } from "@/features/auth/state";
 import { loginSchema } from "@/features/auth/validations";
+import { canAccessInternalApp } from "@/lib/permissions";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import type { UserRole } from "@/types/domain";
 
 export async function loginAction(
   _previousState: LoginState,
@@ -39,17 +41,18 @@ export async function loginAction(
     .eq("id", signInData.user.id)
     .maybeSingle();
 
-  const isOwnerAdmin =
+  const hasInternalAccess =
     !profileError &&
-    profile?.role === "owner_admin" &&
+    profile &&
+    canAccessInternalApp(profile.role as UserRole) &&
     profile.status === "active";
 
-  if (!isOwnerAdmin) {
+  if (!hasInternalAccess) {
     await supabase.auth.signOut();
 
     return {
       status: "error",
-      message: "Tu usuario no tiene acceso de propietario activo.",
+      message: "Tu usuario no tiene acceso interno activo.",
     };
   }
 

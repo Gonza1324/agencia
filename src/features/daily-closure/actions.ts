@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import type { DailyClosureFormState } from "@/features/daily-closure/state";
 import {
   dailyClosureSchema,
@@ -29,7 +29,7 @@ export async function closeBusinessDayAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data: id, error } = await supabase.rpc("close_business_day", {
     p_business_date: parsed.data.businessDate,
     p_counted_cash_amount: parsed.data.countedCashAmount,
@@ -69,7 +69,7 @@ export async function reopenBusinessDayAction(
     };
   }
 
-  const { supabase } = await requireOwnerAdmin();
+  const { supabase } = await requireOperator();
   const { data: id, error } = await supabase.rpc("reopen_business_day", {
     p_business_date: parsed.data.businessDate,
     p_reason: parsed.data.reason,

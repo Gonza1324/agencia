@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireOwnerAdmin } from "@/features/auth/guards";
+import { requireOperator } from "@/features/auth/guards";
 import type { SubagentFormState } from "@/features/subagents/state";
 import {
   subagentIdSchema,
@@ -39,7 +39,7 @@ export async function createSubagentAction(
     };
   }
 
-  const { supabase, user } = await requireOwnerAdmin();
+  const { supabase, user } = await requireOperator();
   const { data, error } = await supabase
     .from("subagents")
     .insert({
@@ -80,7 +80,7 @@ export async function updateSubagentAction(
     };
   }
 
-  const { supabase, user } = await requireOwnerAdmin();
+  const { supabase, user } = await requireOperator();
   const { data, error } = await supabase
     .from("subagents")
     .update({
@@ -119,7 +119,7 @@ export async function toggleSubagentStatusAction(formData: FormData) {
     redirect("/subagentes?error=invalid");
   }
 
-  const { supabase, user } = await requireOwnerAdmin();
+  const { supabase, user } = await requireOperator();
   const { data: currentSubagent, error: readError } = await supabase
     .from("subagents")
     .select("status")
