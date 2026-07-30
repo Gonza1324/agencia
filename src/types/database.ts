@@ -879,6 +879,70 @@ export type Database = {
           total_withdrawals: number;
         }[];
       };
+      get_daily_report: {
+        Args: { p_date: string };
+        Returns: {
+          bank_difference: number;
+          bank_income: number;
+          cash_difference: number;
+          cash_income: number;
+          indebted_subagents: number;
+          late_subagents: number;
+          pending_subagents: number;
+          settlements_count: number;
+          total_available: number;
+          total_expense: number;
+          total_income: number;
+          total_withdrawals: number;
+        }[];
+      };
+      get_period_report: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          ending_bank_balance: number;
+          ending_cash_balance: number;
+          ending_total_balance: number;
+          operating_profit: number;
+          outstanding_debt: number;
+          total_expense: number;
+          total_income: number;
+          total_withdrawals: number;
+        }[];
+      };
+      get_report_daily_series: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          closing_bank_balance: number;
+          closing_cash_balance: number;
+          closing_total_balance: number;
+          expense: number;
+          income: number;
+          is_working_day: boolean;
+          operating_profit: number;
+          report_date: string;
+          withdrawals: number;
+        }[];
+      };
+      get_report_owner_withdrawals: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          owner_name: string;
+          withdrawal_amount: number;
+          withdrawals_count: number;
+        }[];
+      };
+      get_report_subagent_ranking: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          machine_code: string;
+          missing_days: number;
+          outstanding_balance: number;
+          received_amount: number;
+          settlements_count: number;
+          subagent_id: string;
+          subagent_name: string;
+        }[];
+      };
       get_subagent_account_summary: {
         Args: { p_subagent_id: string };
         Returns: {

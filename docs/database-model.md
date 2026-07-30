@@ -34,6 +34,8 @@ La base está diseñada para Supabase/PostgreSQL con RLS desde el inicio.
   generar saldo a favor.
 - El cierre diario guarda una instantánea del arqueo. El estado de
   `business_days` bloquea escrituras operativas hasta una reapertura auditada.
+- Los reportes agregan movimientos y rendiciones mediante funciones SQL por
+  fecha o período; los saldos históricos se reconstruyen hasta la fecha final.
 - Rendiciones anuladas no bloquean una nueva rendición para la misma fecha.
 - Deuda monetaria solo existe cuando se cargó `expected_amount`.
 - RLS inicial permite gestión completa solo a `owner_admin`.

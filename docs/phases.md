@@ -67,6 +67,10 @@ en días cerrados y reapertura con motivo y auditoría.
 
 Reportes diarios, semanales y mensuales básicos.
 
+Estado: completa. Incluye métricas operativas diarias, ganancia semanal y
+mensual, evolución de Caja, ranking por dinero rendido, atrasos, deuda conocida
+y retiros agrupados por dueño.
+
 ## Fase 1.10 — Pulido
 
 Responsive, estados vacíos, errores, confirmaciones, tests y documentación final.

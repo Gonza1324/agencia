@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.8 — Cierre diario.
+Fase 1.9 — Reportes operativos.
 
 La base incluye:
 
@@ -42,6 +42,9 @@ La base incluye:
 - Nota obligatoria ante diferencias de cierre.
 - Bloqueo de operaciones en días cerrados.
 - Reapertura con motivo y auditoría.
+- Reportes diarios, semanales y mensuales filtrables.
+- Ganancia operativa, evolución de Caja y saldos históricos.
+- Rankings de Subagentes, atrasos, deudas y retiros por dueño.
 
 ## Requisitos
 
@@ -111,5 +114,4 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.9: reportes.
-2. Fase 1.10: pulido, tests y documentación final.
+1. Fase 1.10: pulido, tests y documentación final.
