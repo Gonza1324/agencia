@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateSettlementAmounts } from "@/lib/commissions";
+import {
+  calculateRemainingPayment,
+  calculateSettlementAmounts,
+} from "@/lib/commissions";
 
 describe("calculateSettlementAmounts", () => {
   it("calculates the commission and expected settlement from the percentage", () => {
@@ -33,5 +36,19 @@ describe("calculateSettlementAmounts", () => {
       creditBalanceAmount: 494_300,
       expectedAmount: 0,
     });
+  });
+});
+
+describe("calculateRemainingPayment", () => {
+  it("fills the full expected amount when the other method is empty", () => {
+    expect(calculateRemainingPayment(100_000, 0)).toBe(100_000);
+  });
+
+  it("subtracts the amount already entered in the other method", () => {
+    expect(calculateRemainingPayment(100_000, 55_000)).toBe(45_000);
+  });
+
+  it("never suggests a negative payment", () => {
+    expect(calculateRemainingPayment(100_000, 105_000)).toBe(0);
   });
 });

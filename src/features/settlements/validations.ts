@@ -30,9 +30,9 @@ export const settlementSchema = z
     paymentMethod: z.enum(["cash", "bank_transfer", "mixed"]),
     cashAmount: requiredMoney,
     bankAmount: requiredMoney,
-    salesAmount: optionalMoney,
+    salesAmount: requiredMoney,
     commissionAmount: optionalMoney,
-    prizesPaidAmount: optionalMoney,
+    prizesPaidAmount: requiredMoney,
     expectedAmount: optionalMoney,
     confirmOverpayment: z.preprocess((value) => value === "true", z.boolean()),
     notes: z

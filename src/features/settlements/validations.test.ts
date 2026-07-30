@@ -8,9 +8,9 @@ const validSettlement = {
   paymentMethod: "mixed",
   cashAmount: "600",
   bankAmount: "400",
-  salesAmount: "",
+  salesAmount: "1500",
   commissionAmount: "",
-  prizesPaidAmount: "",
+  prizesPaidAmount: "300",
   expectedAmount: "1200",
   notes: "",
 };

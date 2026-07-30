@@ -28,3 +28,14 @@ export function calculateSettlementAmounts(
 
   return { commissionAmount, creditBalanceAmount, expectedAmount };
 }
+
+export function calculateRemainingPayment(
+  expectedAmount: number,
+  otherPaymentAmount: number,
+) {
+  return (
+    Math.round(
+      (Math.max(expectedAmount - otherPaymentAmount, 0) + Number.EPSILON) * 100,
+    ) / 100
+  );
+}

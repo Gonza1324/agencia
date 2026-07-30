@@ -20,7 +20,10 @@ import {
   initialSettlementFormState,
   type SettlementFormState,
 } from "@/features/settlements/state";
-import { calculateSettlementAmounts } from "@/lib/commissions";
+import {
+  calculateRemainingPayment,
+  calculateSettlementAmounts,
+} from "@/lib/commissions";
 import { formatMoney } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
@@ -92,6 +95,9 @@ export function SettlementForm({
   const [showOverpaymentConfirmation, setShowOverpaymentConfirmation] =
     useState(false);
   const [subagentId, setSubagentId] = useState(settlement?.subagentId ?? "");
+  const [paymentMethod, setPaymentMethod] = useState(
+    settlement?.paymentMethod ?? "cash",
+  );
   const [cashAmount, setCashAmount] = useState(
     settlement?.cashAmount.toString() ?? "0",
   );
@@ -133,6 +139,40 @@ export function SettlementForm({
   function resetOverpaymentConfirmation() {
     if (confirmationInputRef.current) {
       confirmationInputRef.current.value = "false";
+    }
+  }
+
+  function selectPaymentMethod(nextCashAmount: string, nextBankAmount: string) {
+    const nextCash = Number(nextCashAmount) || 0;
+    const nextBank = Number(nextBankAmount) || 0;
+
+    setPaymentMethod(
+      nextCash > 0 && nextBank > 0
+        ? "mixed"
+        : nextBank > 0
+          ? "bank_transfer"
+          : "cash",
+    );
+  }
+
+  function fillRemaining(method: "bank" | "cash") {
+    const expectedAmount = calculatedAmounts.expectedAmount ?? 0;
+    const otherAmount =
+      method === "cash" ? Number(bankAmount) || 0 : Number(cashAmount) || 0;
+    const remainingAmount = calculateRemainingPayment(
+      expectedAmount,
+      otherAmount,
+    );
+    const formattedAmount = remainingAmount.toString();
+
+    resetOverpaymentConfirmation();
+
+    if (method === "cash") {
+      setCashAmount(formattedAmount);
+      selectPaymentMethod(formattedAmount, bankAmount);
+    } else {
+      setBankAmount(formattedAmount);
+      selectPaymentMethod(cashAmount, formattedAmount);
     }
   }
 
@@ -213,53 +253,7 @@ export function SettlementForm({
       </div>
 
       <fieldset className="rounded-lg border p-5">
-        <legend className="px-2 font-semibold">Pago recibido</legend>
-        <div className="grid gap-5 md:grid-cols-3">
-          <label className="block">
-            <span className="text-sm font-medium">Medio de pago</span>
-            <select
-              className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-              name="paymentMethod"
-              defaultValue={settlement?.paymentMethod ?? "cash"}
-            >
-              <option value="cash">Efectivo</option>
-              <option value="bank_transfer">Transferencia</option>
-              <option value="mixed">Mixto</option>
-            </select>
-            <FieldError errors={state.fieldErrors?.paymentMethod} />
-          </label>
-          <MoneyField
-            label="Monto efectivo"
-            name="cashAmount"
-            value={cashAmount}
-            onChange={(value) => {
-              resetOverpaymentConfirmation();
-              setCashAmount(value);
-            }}
-            errors={state.fieldErrors?.cashAmount}
-            required
-          />
-          <MoneyField
-            label="Monto banco"
-            name="bankAmount"
-            value={bankAmount}
-            onChange={(value) => {
-              resetOverpaymentConfirmation();
-              setBankAmount(value);
-            }}
-            errors={state.fieldErrors?.bankAmount}
-            required
-          />
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          En pagos mixtos, ambos montos deben ser mayores a cero.
-        </p>
-      </fieldset>
-
-      <fieldset className="rounded-lg border p-5">
-        <legend className="px-2 font-semibold">
-          Información del cierre (opcional)
-        </legend>
+        <legend className="px-2 font-semibold">Información del cierre</legend>
         <div className="grid gap-5 md:grid-cols-2">
           <MoneyField
             label="Venta del día"
@@ -270,6 +264,7 @@ export function SettlementForm({
               setSalesAmount(value);
             }}
             errors={state.fieldErrors?.salesAmount}
+            required
           />
           <CalculatedMoneyField
             label={`Comisión${
@@ -290,6 +285,7 @@ export function SettlementForm({
               setPrizesPaidAmount(value);
             }}
             errors={state.fieldErrors?.prizesPaidAmount}
+            required
           />
           <CalculatedMoneyField
             label="Importe que debía rendir"
@@ -311,6 +307,62 @@ export function SettlementForm({
             {formatMoney(calculatedAmounts.creditBalanceAmount)}
           </p>
         ) : null}
+      </fieldset>
+
+      <fieldset className="rounded-lg border p-5">
+        <legend className="px-2 font-semibold">Pago recibido</legend>
+        <div className="grid gap-5 md:grid-cols-3">
+          <label className="block">
+            <span className="text-sm font-medium">Medio de pago</span>
+            <select
+              className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              name="paymentMethod"
+              value={paymentMethod}
+              onChange={(event) =>
+                setPaymentMethod(
+                  event.target.value as "bank_transfer" | "cash" | "mixed",
+                )
+              }
+            >
+              <option value="cash">Efectivo</option>
+              <option value="bank_transfer">Transferencia</option>
+              <option value="mixed">Mixto</option>
+            </select>
+            <FieldError errors={state.fieldErrors?.paymentMethod} />
+          </label>
+          <MoneyField
+            label="Monto efectivo"
+            name="cashAmount"
+            value={cashAmount}
+            onChange={(value) => {
+              resetOverpaymentConfirmation();
+              setCashAmount(value);
+              selectPaymentMethod(value, bankAmount);
+            }}
+            onFillRemaining={() => fillRemaining("cash")}
+            fillRemainingDisabled={calculatedAmounts.expectedAmount === null}
+            errors={state.fieldErrors?.cashAmount}
+            required
+          />
+          <MoneyField
+            label="Monto banco"
+            name="bankAmount"
+            value={bankAmount}
+            onChange={(value) => {
+              resetOverpaymentConfirmation();
+              setBankAmount(value);
+              selectPaymentMethod(cashAmount, value);
+            }}
+            onFillRemaining={() => fillRemaining("bank")}
+            fillRemainingDisabled={calculatedAmounts.expectedAmount === null}
+            errors={state.fieldErrors?.bankAmount}
+            required
+          />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Podés completar automáticamente lo que falta en efectivo o banco. Si
+          usás ambos, el medio de pago cambia a Mixto.
+        </p>
       </fieldset>
 
       <label className="block">
@@ -405,24 +457,45 @@ export function SettlementForm({
 function MoneyField({
   defaultValue,
   errors,
+  fillRemainingDisabled,
   label,
   name,
   onChange,
+  onFillRemaining,
   required,
   value,
 }: {
   defaultValue?: number | null;
   errors?: string[];
+  fillRemainingDisabled?: boolean;
   label: string;
   name: string;
   onChange?: (value: string) => void;
+  onFillRemaining?: () => void;
   required?: boolean;
   value?: string;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium">{label}</span>
+    <div className="block">
+      <div className="flex min-h-7 items-center justify-between gap-2">
+        <label className="text-sm font-medium" htmlFor={name}>
+          {label}
+        </label>
+        {onFillRemaining ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            disabled={fillRemainingDisabled}
+            onClick={onFillRemaining}
+          >
+            Completar restante
+          </Button>
+        ) : null}
+      </div>
       <input
+        id={name}
         className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
         type="number"
         name={name}
@@ -437,7 +510,7 @@ function MoneyField({
         aria-invalid={Boolean(errors)}
       />
       <FieldError errors={errors} />
-    </label>
+    </div>
   );
 }
 
