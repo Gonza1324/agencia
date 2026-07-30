@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.3 — ABM de Subagentes.
+Fase 1.4 — Día operativo y dashboard base.
 
 La base incluye:
 
@@ -25,6 +25,9 @@ La base incluye:
 - Alta, edición, activación e inactivación sin borrado físico.
 - Detalle con estado, notas y actividad reciente.
 - Auditoría automática de cambios de Subagentes desde PostgreSQL.
+- Día operativo automático de lunes a sábado en horario argentino.
+- Dashboard real con rendiciones, pendientes y alertas progresivas.
+- Domingos sin apertura ni pendientes nuevos.
 
 ## Requisitos
 
@@ -94,6 +97,6 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.4: día operativo y dashboard con datos reales.
-2. Fase 1.5: carga de rendiciones y movimientos asociados.
-3. Fase 1.6: caja, saldos y movimientos manuales.
+1. Fase 1.5: carga de rendiciones y movimientos asociados.
+2. Fase 1.6: caja, saldos y movimientos manuales.
+3. Fase 1.7: cuenta corriente de Subagentes.

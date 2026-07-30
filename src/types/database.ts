@@ -783,6 +783,25 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      ensure_current_business_day: {
+        Args: never;
+        Returns: Database["public"]["Tables"]["business_days"]["Row"][];
+      };
+      get_subagent_dashboard: {
+        Args: { p_date?: string };
+        Returns: {
+          dashboard_status: string;
+          debt_today: number;
+          delay_days: number;
+          known_balance: number;
+          last_settlement_date: string | null;
+          machine_code: string;
+          received_today: number;
+          subagent_id: string;
+          subagent_name: string;
+          today_settlement_id: string | null;
+        }[];
+      };
       is_owner_admin: { Args: never; Returns: boolean };
     };
     Enums: {

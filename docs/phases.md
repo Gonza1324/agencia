@@ -28,6 +28,10 @@ vacíos, confirmaciones y auditoría automática de altas y cambios.
 
 Determinación de día operativo, pendientes automáticos y alertas.
 
+Estado: completa. La apertura es automática de lunes a sábado, los domingos
+no generan pendientes nuevos y el dashboard calcula estados y atrasos sobre
+datos reales.
+
 ## Fase 1.5 — Rendiciones
 
 Carga de rendición, medios de pago, deuda conocida, movimientos de caja y auditoría.

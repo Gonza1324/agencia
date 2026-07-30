@@ -1,3 +1,5 @@
+import { ARGENTINA_TIME_ZONE } from "@/config/business";
+
 export const moneyFormatter = new Intl.NumberFormat("es-AR", {
   style: "currency",
   currency: "ARS",
@@ -9,12 +11,14 @@ export const dateFormatter = new Intl.DateTimeFormat("es-AR", {
   day: "2-digit",
   month: "long",
   year: "numeric",
+  timeZone: ARGENTINA_TIME_ZONE,
 });
 
 export const shortDateFormatter = new Intl.DateTimeFormat("es-AR", {
   day: "2-digit",
   month: "2-digit",
   year: "numeric",
+  timeZone: ARGENTINA_TIME_ZONE,
 });
 
 export const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
@@ -23,6 +27,7 @@ export const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
   year: "numeric",
   hour: "2-digit",
   minute: "2-digit",
+  timeZone: ARGENTINA_TIME_ZONE,
 });
 
 export function formatMoney(value: number) {
@@ -43,4 +48,8 @@ export function formatDateTime(value: Date | string) {
   return dateTimeFormatter.format(
     typeof value === "string" ? new Date(value) : value,
   );
+}
+
+export function formatDateKey(value: string) {
+  return shortDateFormatter.format(new Date(`${value}T12:00:00Z`));
 }
