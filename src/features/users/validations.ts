@@ -3,6 +3,7 @@ import { z } from "zod";
 export const manageableUserRoleSchema = z.enum([
   "owner_admin",
   "cash_operator",
+  "subagent",
   "viewer",
 ]);
 
@@ -42,4 +43,9 @@ export const updateUserSchema = z.object({
 export const resetUserPasswordSchema = z.object({
   id: z.string().uuid("El usuario no es válido."),
   temporaryPassword: temporaryPasswordSchema,
+});
+
+export const subagentAssignmentsSchema = z.object({
+  userId: z.string().uuid("El usuario no es válido."),
+  subagentIds: z.array(z.string().uuid("La máquina no es válida.")).max(50),
 });

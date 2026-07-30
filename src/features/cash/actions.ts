@@ -47,9 +47,9 @@ export async function createCashMovementAction(
       p_category_id: parsed.data.categoryId ?? null,
       p_amount: parsed.data.amount,
       p_direction: parsed.data.direction,
-      p_owner_name: parsed.data.ownerName ?? null,
-      p_description: parsed.data.description ?? null,
-      p_note: parsed.data.note ?? null,
+      p_owner_name: parsed.data.ownerName ?? undefined,
+      p_description: parsed.data.description ?? undefined,
+      p_note: parsed.data.note ?? undefined,
     },
   );
 

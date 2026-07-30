@@ -1,14 +1,18 @@
 import Link from "next/link";
 
 import { requireOwnerAdmin } from "@/features/auth/guards";
-import { getManagedUsers } from "@/features/users/queries";
+import {
+  getAssignableSubagents,
+  getManagedUsers,
+} from "@/features/users/queries";
 import { UserCreateForm } from "@/features/users/user-create-form";
 import { UserManagementCard } from "@/features/users/user-management-card";
 
 export default async function UsersPage() {
-  const [{ user: currentUser }, users] = await Promise.all([
+  const [{ user: currentUser }, users, subagents] = await Promise.all([
     requireOwnerAdmin(),
     getManagedUsers(),
+    getAssignableSubagents(),
   ]);
 
   return (
@@ -22,7 +26,7 @@ export default async function UsersPage() {
         </Link>
         <h1 className="mt-2 text-3xl font-semibold">Usuarios y roles</h1>
         <p className="mt-1 max-w-3xl text-muted-foreground">
-          Creá accesos internos, definí qué puede hacer cada persona e inactivá
+          Creá accesos internos o de Subagentes, definí permisos e inactivá
           usuarios sin borrar su historial.
         </p>
       </div>
@@ -37,7 +41,7 @@ export default async function UsersPage() {
 
       <section className="rounded-lg border bg-muted/30 p-5">
         <h2 className="font-semibold">Permisos por rol</h2>
-        <div className="mt-3 grid gap-3 text-sm md:grid-cols-3">
+        <div className="mt-3 grid gap-3 text-sm md:grid-cols-2 xl:grid-cols-4">
           <div>
             <p className="font-medium">Propietario</p>
             <p className="text-muted-foreground">
@@ -54,6 +58,12 @@ export default async function UsersPage() {
             <p className="font-medium">Visor</p>
             <p className="text-muted-foreground">
               Solo Dashboard y Reportes, sin modificaciones.
+            </p>
+          </div>
+          <div>
+            <p className="font-medium">Subagente</p>
+            <p className="text-muted-foreground">
+              Solo sus máquinas, rendiciones, cuenta corriente y saldos.
             </p>
           </div>
         </div>
@@ -77,6 +87,10 @@ export default async function UsersPage() {
               role: user.role,
               status: user.status,
             }}
+            subagents={subagents}
+            assignedSubagentIds={user.subagent_links
+              .filter((link) => link.status === "active")
+              .map((link) => link.subagent_id)}
           />
         ))}
       </section>

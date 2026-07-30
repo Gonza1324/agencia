@@ -34,7 +34,7 @@ export async function closeBusinessDayAction(
     p_business_date: parsed.data.businessDate,
     p_counted_cash_amount: parsed.data.countedCashAmount,
     p_reported_bank_amount: parsed.data.reportedBankAmount,
-    p_note: parsed.data.note ?? null,
+    p_note: parsed.data.note ?? undefined,
   });
 
   if (error) {

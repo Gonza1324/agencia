@@ -43,8 +43,8 @@ export async function createExpenseObligationAction(
     p_category_id: parsed.data.categoryId,
     p_amount: parsed.data.amount,
     p_due_date: parsed.data.dueDate,
-    p_recurrence_months: parsed.data.recurrenceMonths ?? null,
-    p_notes: parsed.data.notes ?? null,
+    p_recurrence_months: parsed.data.recurrenceMonths ?? undefined,
+    p_notes: parsed.data.notes ?? undefined,
   });
 
   if (error) {
@@ -87,8 +87,8 @@ export async function updateExpenseObligationAction(
       p_category_id: parsed.data.categoryId,
       p_amount: parsed.data.amount,
       p_due_date: parsed.data.dueDate,
-      p_recurrence_months: parsed.data.recurrenceMonths ?? null,
-      p_notes: parsed.data.notes ?? null,
+      p_recurrence_months: parsed.data.recurrenceMonths ?? undefined,
+      p_notes: parsed.data.notes ?? undefined,
     },
   );
 

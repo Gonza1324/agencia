@@ -63,3 +63,13 @@ export async function requireOwnerAdmin() {
 
   return context;
 }
+
+export async function requireSubagentUser() {
+  const context = await requireProfile();
+
+  if (context.profile.role !== "subagent") {
+    throw new Error("SUBAGENT_USER_REQUIRED");
+  }
+
+  return context;
+}

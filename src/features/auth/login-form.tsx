@@ -40,7 +40,7 @@ export function LoginForm({
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="dueña@agencia.com"
+          placeholder="usuario@correo.com"
           required
         />
       </label>

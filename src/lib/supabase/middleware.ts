@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { hasPublicSupabaseEnv } from "@/lib/env";
-import { canAccessInternalApp } from "@/lib/permissions";
 import type { CookieOptions } from "@supabase/ssr";
 import type { Database } from "@/types/database";
 import type { UserRole } from "@/types/domain";
@@ -70,10 +69,7 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .maybeSingle();
 
-    if (
-      profile?.status === "active" &&
-      canAccessInternalApp(profile.role as UserRole)
-    ) {
+    if (profile?.status === "active") {
       activeRole = profile.role as UserRole;
     }
   }
@@ -89,11 +85,14 @@ export async function updateSession(request: NextRequest) {
 
   if (user && activeRole && request.nextUrl.pathname === "/login") {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
+    redirectUrl.pathname =
+      activeRole === "subagent" ? "/mi-cuenta" : "/dashboard";
     return NextResponse.redirect(redirectUrl);
   }
 
   const pathname = request.nextUrl.pathname;
+  const isSubagentRoute =
+    pathname === "/" || pathname.startsWith("/mi-cuenta");
   const isViewerRoute =
     pathname === "/" ||
     pathname.startsWith("/dashboard") ||
@@ -101,11 +100,14 @@ export async function updateSession(request: NextRequest) {
   const isOwnerRoute = pathname.startsWith("/configuracion");
 
   if (
+    (activeRole === "subagent" && !isSubagentRoute) ||
+    (activeRole !== "subagent" && pathname.startsWith("/mi-cuenta")) ||
     (activeRole === "viewer" && !isViewerRoute) ||
     (activeRole === "cash_operator" && isOwnerRoute)
   ) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
+    redirectUrl.pathname =
+      activeRole === "subagent" ? "/mi-cuenta" : "/dashboard";
     redirectUrl.searchParams.set("reason", "forbidden");
     return NextResponse.redirect(redirectUrl);
   }

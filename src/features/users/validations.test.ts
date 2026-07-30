@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createUserSchema,
   resetUserPasswordSchema,
+  subagentAssignmentsSchema,
   updateUserSchema,
 } from "@/features/users/validations";
 
@@ -18,7 +19,7 @@ describe("validaciones de usuarios", () => {
     ).toBe(true);
   });
 
-  it("no permite asignar el rol Subagente desde la administración interna", () => {
+  it("permite crear un acceso de Subagente", () => {
     expect(
       createUserSchema.safeParse({
         email: "subagente@agencia.com",
@@ -26,7 +27,7 @@ describe("validaciones de usuarios", () => {
         role: "subagent",
         temporaryPassword: "Temporal643!",
       }).success,
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("rechaza contraseñas temporales débiles", () => {
@@ -45,6 +46,18 @@ describe("validaciones de usuarios", () => {
         fullName: "Usuario Visor",
         role: "viewer",
         status: "inactive",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("valida las máquinas asignadas a un usuario", () => {
+    expect(
+      subagentAssignmentsSchema.safeParse({
+        userId: "439f5dc7-c91d-471b-a4e6-66e041035df8",
+        subagentIds: [
+          "11111111-1111-4111-8111-111111111111",
+          "22222222-2222-4222-8222-222222222222",
+        ],
       }).success,
     ).toBe(true);
   });

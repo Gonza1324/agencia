@@ -39,8 +39,8 @@ export async function createSubagentAccountMovementAction(
       p_subagent_id: parsed.data.subagentId,
       p_type: parsed.data.type,
       p_amount: parsed.data.amount,
-      p_cash_account_id: parsed.data.cashAccountId ?? null,
-      p_notes: parsed.data.notes ?? null,
+      p_cash_account_id: parsed.data.cashAccountId ?? undefined,
+      p_notes: parsed.data.notes ?? undefined,
     },
   );
 

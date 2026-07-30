@@ -46,17 +46,21 @@ export async function loginAction(
     profile &&
     canAccessInternalApp(profile.role as UserRole) &&
     profile.status === "active";
+  const hasSubagentAccess =
+    !profileError &&
+    profile?.role === "subagent" &&
+    profile.status === "active";
 
-  if (!hasInternalAccess) {
+  if (!hasInternalAccess && !hasSubagentAccess) {
     await supabase.auth.signOut();
 
     return {
       status: "error",
-      message: "Tu usuario no tiene acceso interno activo.",
+      message: "Tu usuario no tiene un acceso activo.",
     };
   }
 
-  redirect("/dashboard");
+  redirect(hasSubagentAccess ? "/mi-cuenta" : "/dashboard");
 }
 
 export async function logoutAction() {

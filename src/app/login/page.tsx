@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     reason === "unauthorized"
       ? {
           status: "error",
-          message: "Tu usuario no tiene acceso interno activo.",
+          message: "Tu usuario no tiene un acceso activo.",
         }
       : initialLoginState;
 
@@ -24,7 +24,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Ingresar al panel
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Acceso interno para Agencia 643.
+            Acceso para Agencia 643 y sus Subagentes.
           </p>
         </div>
         <LoginForm initialState={loginState} />

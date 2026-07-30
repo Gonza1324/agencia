@@ -67,10 +67,10 @@ async function getRpcArgs(
     p_cash_amount: input.cashAmount,
     p_bank_amount: input.bankAmount,
     p_sales_amount: input.salesAmount ?? null,
-    p_commission_amount: calculated.commissionAmount,
+    p_commission_amount: calculated.commissionAmount ?? undefined,
     p_prizes_paid_amount: input.prizesPaidAmount ?? null,
-    p_expected_amount: calculated.expectedAmount,
-    p_notes: input.notes ?? null,
+    p_expected_amount: calculated.expectedAmount ?? undefined,
+    p_notes: input.notes ?? undefined,
   };
 }
 

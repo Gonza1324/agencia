@@ -7,6 +7,7 @@ import type { UserFormState } from "@/features/users/state";
 import {
   createUserSchema,
   resetUserPasswordSchema,
+  subagentAssignmentsSchema,
   updateUserSchema,
 } from "@/features/users/validations";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
@@ -307,5 +308,45 @@ export async function resetUserPasswordAction(
   return {
     status: "success",
     message: "Contraseña temporal actualizada.",
+  };
+}
+
+export async function updateSubagentAssignmentsAction(
+  _previousState: UserFormState,
+  formData: FormData,
+): Promise<UserFormState> {
+  const parsed = subagentAssignmentsSchema.safeParse({
+    userId: formData.get("userId"),
+    subagentIds: formData.getAll("subagentIds"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Revisá las máquinas seleccionadas.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  const { supabase } = await requireOwnerAdmin();
+  const { error } = await supabase.rpc("set_subagent_user_links", {
+    p_user_id: parsed.data.userId,
+    p_subagent_ids: parsed.data.subagentIds,
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message.includes("rol Subagente")
+        ? "El usuario debe tener rol Subagente antes de asignarle máquinas."
+        : "No se pudieron guardar las máquinas asignadas.",
+    };
+  }
+
+  revalidatePath("/configuracion/usuarios");
+
+  return {
+    status: "success",
+    message: "Máquinas asignadas correctamente.",
   };
 }

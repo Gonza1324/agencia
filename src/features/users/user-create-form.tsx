@@ -77,6 +77,7 @@ export function UserCreateForm() {
           >
             <option value="owner_admin">Propietario</option>
             <option value="cash_operator">Operador</option>
+            <option value="subagent">Subagente</option>
             <option value="viewer">Visor</option>
           </select>
         </label>

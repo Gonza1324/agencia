@@ -14,10 +14,18 @@ import {
   initialUserFormState,
   type UserFormState,
 } from "@/features/users/state";
+import { SubagentAssignmentsForm } from "@/features/users/subagent-assignments-form";
 import type { ProfileStatus, UserRole } from "@/types/domain";
 
 type UserManagementCardProps = {
+  assignedSubagentIds: string[];
   currentUserId: string;
+  subagents: Array<{
+    id: string;
+    machine_code: string;
+    name: string;
+    status: ProfileStatus;
+  }>;
   user: {
     id: string;
     email: string;
@@ -73,7 +81,9 @@ function FormMessage({ state }: { state: UserFormState }) {
 }
 
 export function UserManagementCard({
+  assignedSubagentIds,
   currentUserId,
+  subagents,
   user,
 }: UserManagementCardProps) {
   const [updateState, updateAction] = useActionState<UserFormState, FormData>(
@@ -140,6 +150,7 @@ export function UserManagementCard({
           >
             <option value="owner_admin">Propietario</option>
             <option value="cash_operator">Operador</option>
+            <option value="subagent">Subagente</option>
             <option value="viewer">Visor</option>
           </select>
           {isCurrentUser ? (
@@ -168,6 +179,14 @@ export function UserManagementCard({
         </div>
       </form>
       <FormMessage state={updateState} />
+
+      {user.role === "subagent" ? (
+        <SubagentAssignmentsForm
+          assignedSubagentIds={assignedSubagentIds}
+          subagents={subagents}
+          userId={user.id}
+        />
+      ) : null}
 
       <details className="mt-4 border-t pt-4">
         <summary className="cursor-pointer text-sm font-medium">
