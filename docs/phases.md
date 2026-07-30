@@ -21,6 +21,9 @@ Estado: completa.
 
 Listado, alta, edición, activación, inactivación y detalle básico.
 
+Estado: completa. Incluye búsqueda y filtros, validación compartida, estados
+vacíos, confirmaciones y auditoría automática de altas y cambios.
+
 ## Fase 1.4 — Día operativo y dashboard base
 
 Determinación de día operativo, pendientes automáticos y alertas.

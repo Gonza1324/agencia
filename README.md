@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.1 — Auth y usuarios.
+Fase 1.3 — ABM de Subagentes.
 
 La base incluye:
 
@@ -21,6 +21,10 @@ La base incluye:
 - Login y logout reales con Supabase Auth.
 - Protección de rutas para perfiles `owner_admin` activos.
 - Tipos de base de datos generados desde el proyecto Supabase.
+- Listado, búsqueda y filtros de Subagentes.
+- Alta, edición, activación e inactivación sin borrado físico.
+- Detalle con estado, notas y actividad reciente.
+- Auditoría automática de cambios de Subagentes desde PostgreSQL.
 
 ## Requisitos
 
@@ -54,10 +58,10 @@ npm run build
 
 ## Supabase
 
-La primera migración está en:
+Las migraciones versionadas están en:
 
 ```bash
-supabase/migrations/001_initial_schema.sql
+supabase/migrations/
 ```
 
 Aplicar con Supabase CLI cuando el proyecto esté vinculado:
@@ -82,7 +86,7 @@ Después de crear usuarios en Supabase Auth, crear su perfil en
 `public.profiles` con el mismo `id` de `auth.users`:
 
 - Juliana
-- Gerónimo
+- Gonzalo
 - Agustina
 
 El procedimiento seguro y la consulta de bootstrap están documentados en
@@ -90,6 +94,6 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.3: ABM de Subagentes.
-2. Fase 1.4: día operativo y dashboard con datos reales.
-3. Fase 1.5: carga de rendiciones y movimientos asociados.
+1. Fase 1.4: día operativo y dashboard con datos reales.
+2. Fase 1.5: carga de rendiciones y movimientos asociados.
+3. Fase 1.6: caja, saldos y movimientos manuales.

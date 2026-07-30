@@ -21,6 +21,8 @@ La base está diseñada para Supabase/PostgreSQL con RLS desde el inicio.
 
 - Los saldos se calculan desde movimientos, no desde un único campo editable.
 - `machine_code` es único solo entre Subagentes activos.
+- Las altas, ediciones y activaciones/inactivaciones de Subagentes generan
+  registros de auditoría mediante un trigger de PostgreSQL.
 - Rendiciones anuladas no bloquean una nueva rendición para la misma fecha.
 - Deuda monetaria solo existe cuando se cargó `expected_amount`.
 - RLS inicial permite gestión completa solo a `owner_admin`.
