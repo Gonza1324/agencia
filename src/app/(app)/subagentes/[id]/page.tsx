@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSubagentAccountSummary } from "@/features/subagent-accounts/queries";
 import { SubagentStatusForm } from "@/features/subagents/subagent-status-form";
 import {
   getSubagentAuditLog,
   getSubagentById,
 } from "@/features/subagents/queries";
-import { formatDateTime, formatShortDate } from "@/lib/formatters";
+import { formatDateTime, formatMoney, formatShortDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 type SubagentDetailPageProps = {
@@ -35,9 +36,10 @@ export default async function SubagentDetailPage({
 }: SubagentDetailPageProps) {
   const { id } = await params;
   const notices = await searchParams;
-  const [subagent, auditLog] = await Promise.all([
+  const [subagent, auditLog, accountSummary] = await Promise.all([
     getSubagentById(id),
     getSubagentAuditLog(id),
+    getSubagentAccountSummary(id),
   ]);
 
   if (!subagent) {
@@ -76,6 +78,12 @@ export default async function SubagentDetailPage({
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/subagentes/${subagent.id}/cuenta-corriente`}
+            className={cn(buttonVariants())}
+          >
+            Cuenta corriente
+          </Link>
           <Link
             href={`/subagentes/${subagent.id}/editar`}
             className={cn(buttonVariants({ variant: "secondary" }))}
@@ -136,9 +144,13 @@ export default async function SubagentDetailPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xl font-semibold">$ 0,00</p>
+            <p className="text-xl font-semibold">
+              {formatMoney(Number(accountSummary?.balance ?? 0))}
+            </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Se calculará en la fase de saldos.
+              {Number(accountSummary?.balance ?? 0) > 0
+                ? "Deuda vigente del Subagente."
+                : "Sin deuda vigente."}
             </p>
           </CardContent>
         </Card>

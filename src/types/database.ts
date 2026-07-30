@@ -802,6 +802,17 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_subagent_account_movement: {
+        Args: {
+          p_amount: number;
+          p_business_date: string;
+          p_cash_account_id?: string | null;
+          p_notes?: string | null;
+          p_subagent_id: string;
+          p_type: Database["public"]["Enums"]["account_movement_type"];
+        };
+        Returns: string;
+      };
       create_manual_cash_movement: {
         Args: {
           p_amount: number;
@@ -845,6 +856,15 @@ export type Database = {
           total_balance: number;
         }[];
       };
+      get_subagent_account_summary: {
+        Args: { p_subagent_id: string };
+        Returns: {
+          active_movements: number;
+          balance: number;
+          total_credits: number;
+          total_debits: number;
+        }[];
+      };
       get_subagent_dashboard: {
         Args: { p_date?: string };
         Returns: {
@@ -881,6 +901,10 @@ export type Database = {
         Returns: undefined;
       };
       void_manual_cash_movement: {
+        Args: { p_movement_id: string; p_reason: string };
+        Returns: undefined;
+      };
+      void_subagent_account_movement: {
         Args: { p_movement_id: string; p_reason: string };
         Returns: undefined;
       };

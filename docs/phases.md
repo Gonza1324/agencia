@@ -51,6 +51,10 @@ configurables.
 
 Saldo por Subagente, pagos de deuda, ajustes, compensaciones e historial.
 
+Estado: completa. Incluye saldo derivado del libro de movimientos, pagos
+parciales o totales conectados transaccionalmente con Caja, ajustes,
+compensaciones, prevención de adelantos y anulaciones auditadas.
+
 ## Fase 1.8 — Cierre diario
 
 Cierre, diferencias, nota obligatoria y reapertura auditada.

@@ -6,7 +6,7 @@ Slug técnico: `loteria-control`.
 
 ## Fase actual
 
-Fase 1.6 — Caja.
+Fase 1.7 — Cuenta corriente de Subagentes.
 
 La base incluye:
 
@@ -34,6 +34,10 @@ La base incluye:
 - Saldos separados de efectivo, banco y total.
 - Ingresos, egresos, retiros, ajustes y transferencias internas.
 - Ganancia operativa y categorías configurables.
+- Saldo real y libro de movimientos por Subagente.
+- Pagos de deuda parciales o totales conectados con Caja.
+- Ajustes, compensaciones y anulaciones con motivo y auditoría.
+- Prevención transaccional de adelantos y saldos a favor.
 
 ## Requisitos
 
@@ -103,6 +107,6 @@ El procedimiento seguro y la consulta de bootstrap están documentados en
 
 ## Próximas fases
 
-1. Fase 1.7: cuenta corriente de Subagentes.
-2. Fase 1.8: cierre diario.
-3. Fase 1.9: reportes.
+1. Fase 1.8: cierre diario.
+2. Fase 1.9: reportes.
+3. Fase 1.10: pulido, tests y documentación final.

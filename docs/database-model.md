@@ -29,6 +29,9 @@ La base está diseñada para Supabase/PostgreSQL con RLS desde el inicio.
   dentro de una única transacción PostgreSQL.
 - Los saldos de Caja se derivan de movimientos activos; las transferencias
   internas se enlazan con `transfer_group_id`.
+- El saldo de cada Subagente se deriva de débitos y créditos activos. Los pagos
+  de deuda crean su ingreso de Caja en la misma transacción y nunca pueden
+  generar saldo a favor.
 - Rendiciones anuladas no bloquean una nueva rendición para la misma fecha.
 - Deuda monetaria solo existe cuando se cargó `expected_amount`.
 - RLS inicial permite gestión completa solo a `owner_admin`.
