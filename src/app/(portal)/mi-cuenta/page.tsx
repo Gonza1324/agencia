@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   BadgeDollarSign,
   Calculator,
   MonitorCog,
@@ -8,11 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMySubagentAccounts } from "@/features/subagent-portal/queries";
-import {
-  formatDateKey,
-  formatDateTime,
-  formatMoney,
-} from "@/lib/formatters";
+import { formatDateKey, formatDateTime, formatMoney } from "@/lib/formatters";
 
 const movementLabels: Record<string, string> = {
   settlement_debt: "Deuda de rendición",
@@ -31,7 +28,8 @@ const settlementLabels: Record<string, string> = {
 };
 
 export default async function MyAccountPage() {
-  const accounts = await getMySubagentAccounts();
+  const portal = await getMySubagentAccounts();
+  const accounts = portal.accounts;
 
   return (
     <div className="space-y-6">
@@ -44,6 +42,54 @@ export default async function MyAccountPage() {
           Consultá saldos, rendiciones y movimientos informados por la Agencia.
         </p>
       </header>
+
+      {portal.alerts.length ? (
+        <section className="rounded-xl border-2 border-red-300 bg-red-50 p-5 text-red-950">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-red-100 p-2 text-red-800">
+              <AlertTriangle className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-red-700">
+                Alerta de rendición
+              </p>
+              <h2 className="mt-1 text-xl font-semibold">
+                {portal.alerts.length === 1
+                  ? "Tenés una máquina atrasada"
+                  : `Tenés ${portal.alerts.length} máquinas atrasadas`}
+              </h2>
+              <p className="mt-1 text-sm text-red-800">
+                La Agencia configuró el aviso desde{" "}
+                {portal.alertPreferences.overdue_min_days}{" "}
+                {portal.alertPreferences.overdue_min_days === 1
+                  ? "día operativo"
+                  : "días operativos"}{" "}
+                de atraso.
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {portal.alerts.map((alert) => (
+                  <div
+                    key={alert.subagent_id}
+                    className="rounded-lg border border-red-200 bg-white/70 px-4 py-3"
+                  >
+                    <p className="font-semibold">{alert.subagent_name}</p>
+                    <p className="mt-1 text-sm">
+                      Máquina {alert.machine_code} · {alert.delay_days}{" "}
+                      {alert.delay_days === 1 ? "día" : "días"} de atraso
+                    </p>
+                    <p className="mt-1 text-xs text-red-700">
+                      Última rendición:{" "}
+                      {alert.last_settlement_date
+                        ? formatDateKey(alert.last_settlement_date)
+                        : "sin rendiciones registradas"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {accounts.length ? (
         accounts.map((account) => (
@@ -69,7 +115,9 @@ export default async function MyAccountPage() {
 function SubagentAccount({
   account,
 }: {
-  account: Awaited<ReturnType<typeof getMySubagentAccounts>>[number];
+  account: Awaited<
+    ReturnType<typeof getMySubagentAccounts>
+  >["accounts"][number];
 }) {
   const balance = Number(account.summary?.balance ?? 0);
   const recentSettlements = account.settlements.slice(0, 12);
@@ -150,7 +198,9 @@ function SubagentAccount({
                       <th className="px-5 py-3 text-right font-medium">
                         Recibido
                       </th>
-                      <th className="px-5 py-3 text-right font-medium">Deuda</th>
+                      <th className="px-5 py-3 text-right font-medium">
+                        Deuda
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -188,9 +238,7 @@ function SubagentAccount({
                         <td className="px-5 py-4 text-right">
                           {settlement.commission_amount === null
                             ? "—"
-                            : formatMoney(
-                                Number(settlement.commission_amount),
-                              )}
+                            : formatMoney(Number(settlement.commission_amount))}
                         </td>
                         <td className="px-5 py-4 text-right font-medium">
                           {formatMoney(Number(settlement.received_amount))}

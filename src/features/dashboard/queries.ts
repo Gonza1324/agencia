@@ -13,7 +13,7 @@ export const getDailyDashboard = cache(async () => {
   const now = new Date();
   const operationalDate = getArgentinaDateKey(now);
   const workingDay = isWorkingDay(now);
-  const { profile, supabase } = await requireInternalUser();
+  const { profile, supabase, user } = await requireInternalUser();
   const userCanOperate = canOperate(profile.role as UserRole);
   const expenseHorizonDate = addDaysToDateKey(operationalDate, 7);
 
@@ -45,6 +45,7 @@ export const getDailyDashboard = cache(async () => {
     expensesResult,
     cashSummaryResult,
     dailyReportResult,
+    alertPreferencesResult,
   ] = await Promise.all([
     supabase.rpc("get_subagent_dashboard", { p_date: operationalDate }),
     businessDay
@@ -67,6 +68,11 @@ export const getDailyDashboard = cache(async () => {
     supabase.rpc("get_daily_report", {
       p_date: operationalDate,
     }),
+    supabase
+      .from("user_alert_preferences")
+      .select("overdue_alerts_enabled, overdue_min_days")
+      .eq("user_id", user.id)
+      .maybeSingle(),
   ]);
 
   if (dashboardResult.error) {
@@ -82,7 +88,8 @@ export const getDailyDashboard = cache(async () => {
   if (
     expensesResult.error ||
     cashSummaryResult.error ||
-    dailyReportResult.error
+    dailyReportResult.error ||
+    alertPreferencesResult.error
   ) {
     throw new Error("No se pudo calcular el resumen financiero diario.");
   }
@@ -113,6 +120,10 @@ export const getDailyDashboard = cache(async () => {
   );
 
   return {
+    alertPreferences: alertPreferencesResult.data ?? {
+      overdue_alerts_enabled: true,
+      overdue_min_days: 1,
+    },
     alertCount,
     businessDay,
     cashSummary,
@@ -126,6 +137,7 @@ export const getDailyDashboard = cache(async () => {
     rows,
     settledToday,
     userCanOperate,
+    userIsOwner: profile.role === "owner_admin",
     workingDay,
   };
 });

@@ -9,6 +9,7 @@ import {
   resetUserPasswordSchema,
   subagentAssignmentsSchema,
   updateUserSchema,
+  userAlertPreferencesSchema,
 } from "@/features/users/validations";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Json } from "@/types/database";
@@ -348,5 +349,51 @@ export async function updateSubagentAssignmentsAction(
   return {
     status: "success",
     message: "Máquinas asignadas correctamente.",
+  };
+}
+
+export async function updateUserAlertPreferencesAction(
+  _previousState: UserFormState,
+  formData: FormData,
+): Promise<UserFormState> {
+  const parsed = userAlertPreferencesSchema.safeParse({
+    userId: formData.get("userId"),
+    overdueAlertsEnabled: formData.get("overdueAlertsEnabled") === "on",
+    overdueMinDays: formData.get("overdueMinDays"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message:
+        parsed.error.issues[0]?.message ??
+        "Revisá la configuración de alertas.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  const { supabase } = await requireOwnerAdmin();
+  const { error } = await supabase.rpc("set_user_alert_preferences", {
+    p_user_id: parsed.data.userId,
+    p_overdue_alerts_enabled: parsed.data.overdueAlertsEnabled,
+    p_overdue_min_days: parsed.data.overdueMinDays,
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message.includes("rol no admite")
+        ? "Las alertas sólo están disponibles para Propietarios y Subagentes."
+        : "No se pudo guardar la configuración de alertas.",
+    };
+  }
+
+  revalidatePath("/configuracion/usuarios");
+  revalidatePath("/dashboard");
+  revalidatePath("/mi-cuenta");
+
+  return {
+    status: "success",
+    message: "Configuración de alertas actualizada.",
   };
 }

@@ -15,9 +15,14 @@ import {
   type UserFormState,
 } from "@/features/users/state";
 import { SubagentAssignmentsForm } from "@/features/users/subagent-assignments-form";
+import { UserAlertPreferencesForm } from "@/features/users/user-alert-preferences-form";
 import type { ProfileStatus, UserRole } from "@/types/domain";
 
 type UserManagementCardProps = {
+  alertPreferences: {
+    overdue_alerts_enabled: boolean;
+    overdue_min_days: number;
+  };
   assignedSubagentIds: string[];
   currentUserId: string;
   subagents: Array<{
@@ -81,6 +86,7 @@ function FormMessage({ state }: { state: UserFormState }) {
 }
 
 export function UserManagementCard({
+  alertPreferences,
   assignedSubagentIds,
   currentUserId,
   subagents,
@@ -184,6 +190,15 @@ export function UserManagementCard({
         <SubagentAssignmentsForm
           assignedSubagentIds={assignedSubagentIds}
           subagents={subagents}
+          userId={user.id}
+        />
+      ) : null}
+
+      {user.role === "owner_admin" || user.role === "subagent" ? (
+        <UserAlertPreferencesForm
+          enabled={alertPreferences.overdue_alerts_enabled}
+          minimumDays={alertPreferences.overdue_min_days}
+          role={user.role}
           userId={user.id}
         />
       ) : null}

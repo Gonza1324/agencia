@@ -68,6 +68,12 @@ export default async function DashboardPage() {
   const alertRows = dashboard.rows.filter((row) =>
     ["late", "late_serious", "late_critical"].includes(row.dashboard_status),
   );
+  const configuredAlertRows = alertRows.filter(
+    (row) => row.delay_days >= dashboard.alertPreferences.overdue_min_days,
+  );
+  const criticalAlertCount = configuredAlertRows.filter(
+    (row) => row.dashboard_status === "late_critical",
+  ).length;
   const hasClosureDifference =
     Number(dashboard.closure?.cash_difference ?? 0) !== 0 ||
     Number(dashboard.closure?.bank_difference ?? 0) !== 0;
@@ -121,8 +127,145 @@ export default async function DashboardPage() {
           label="Alertas de atraso"
           value={String(dashboard.alertCount)}
           helper="Sin generar deuda automática"
+          danger={dashboard.alertCount > 0}
         />
       </section>
+
+      {dashboard.userIsOwner &&
+      dashboard.alertPreferences.overdue_alerts_enabled ? (
+        configuredAlertRows.length ? (
+          <section
+            className={`overflow-hidden rounded-xl border-2 ${
+              criticalAlertCount
+                ? "border-red-400 bg-red-50"
+                : "border-orange-300 bg-orange-50"
+            }`}
+          >
+            <div className="flex flex-col gap-4 border-b border-current/15 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <div
+                  className={`rounded-full p-2 ${
+                    criticalAlertCount
+                      ? "bg-red-100 text-red-800"
+                      : "bg-orange-100 text-orange-800"
+                  }`}
+                >
+                  <AlertTriangle className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-red-700">
+                    Atención prioritaria
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold">
+                    {configuredAlertRows.length}{" "}
+                    {configuredAlertRows.length === 1
+                      ? "Subagente requiere seguimiento"
+                      : "Subagentes requieren seguimiento"}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Alertas activas desde{" "}
+                    {dashboard.alertPreferences.overdue_min_days}{" "}
+                    {dashboard.alertPreferences.overdue_min_days === 1
+                      ? "día operativo"
+                      : "días operativos"}{" "}
+                    de atraso
+                    {criticalAlertCount
+                      ? ` · ${criticalAlertCount} en estado crítico`
+                      : ""}
+                    .
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/configuracion/usuarios"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                Configurar mis alertas
+              </Link>
+            </div>
+
+            <div className="max-h-[430px] divide-y overflow-y-auto bg-card/70">
+              {configuredAlertRows.map((row) => {
+                const presentation =
+                  statusPresentation[row.dashboard_status] ??
+                  statusPresentation.late;
+
+                return (
+                  <div
+                    key={row.subagent_id}
+                    className="flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          href={`/subagentes/${row.subagent_id}`}
+                          className="font-semibold text-primary hover:underline"
+                        >
+                          {row.subagent_name}
+                        </Link>
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {row.machine_code}
+                        </span>
+                        <Badge
+                          variant={presentation.variant}
+                          className={presentation.badgeClassName}
+                        >
+                          {row.delay_days}{" "}
+                          {row.delay_days === 1 ? "día" : "días"} de atraso
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Última rendición:{" "}
+                        {row.last_settlement_date
+                          ? formatDateKey(row.last_settlement_date)
+                          : "nunca rindió"}{" "}
+                        · Saldo conocido:{" "}
+                        {formatMoney(Number(row.known_balance))}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <Link
+                        href={`/subagentes/${row.subagent_id}/cuenta-corriente`}
+                        className={cn(
+                          buttonVariants({ size: "sm", variant: "secondary" }),
+                        )}
+                      >
+                        Ver cuenta corriente
+                      </Link>
+                      {dashboard.userCanOperate ? (
+                        <Link
+                          href="/rendiciones/nueva"
+                          className={cn(buttonVariants({ size: "sm" }))}
+                        >
+                          Registrar rendición
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : (
+          <section className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
+            <CheckCircle2
+              className="mt-0.5 h-5 w-5 shrink-0"
+              aria-hidden="true"
+            />
+            <div>
+              <h2 className="font-semibold">Sin alertas de atraso activas</h2>
+              <p className="mt-1 text-sm text-emerald-800">
+                Ningún Subagente alcanzó el umbral configurado de{" "}
+                {dashboard.alertPreferences.overdue_min_days}{" "}
+                {dashboard.alertPreferences.overdue_min_days === 1
+                  ? "día operativo"
+                  : "días operativos"}
+                .
+              </p>
+            </div>
+          </section>
+        )
+      ) : null}
 
       <section className="rounded-lg border bg-card">
         <div className="flex flex-col gap-4 border-b px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
@@ -263,34 +406,6 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      {alertRows.length ? (
-        <section className="rounded-lg border border-orange-200 bg-orange-50 p-5">
-          <div className="flex items-start gap-3">
-            <AlertTriangle
-              className="mt-0.5 h-5 w-5 shrink-0 text-orange-700"
-              aria-hidden="true"
-            />
-            <div>
-              <h2 className="font-semibold text-orange-950">
-                Hay Subagentes con rendiciones atrasadas
-              </h2>
-              <p className="mt-1 text-sm text-orange-800">
-                {alertRows
-                  .slice(0, 3)
-                  .map(
-                    (row) =>
-                      `${row.subagent_name} (${row.delay_days} ${
-                        row.delay_days === 1 ? "día" : "días"
-                      })`,
-                  )
-                  .join(", ")}
-                {alertRows.length > 3 ? ` y ${alertRows.length - 3} más.` : "."}
-              </p>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       <section
         className={`rounded-lg border ${
           dashboard.expenseForecast.canCover
@@ -348,9 +463,7 @@ export default async function DashboardPage() {
               dashboard.expenseForecast.canCover
                 ? "Alcanza"
                 : `Faltan ${formatMoney(
-                    Math.abs(
-                      dashboard.expenseForecast.remainingAfterExpenses,
-                    ),
+                    Math.abs(dashboard.expenseForecast.remainingAfterExpenses),
                   )}`
             }
             helper={

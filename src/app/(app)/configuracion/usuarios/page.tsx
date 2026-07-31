@@ -87,6 +87,12 @@ export default async function UsersPage() {
               role: user.role,
               status: user.status,
             }}
+            alertPreferences={
+              user.alert_preferences ?? {
+                overdue_alerts_enabled: true,
+                overdue_min_days: 1,
+              }
+            }
             subagents={subagents}
             assignedSubagentIds={user.subagent_links
               .filter((link) => link.status === "active")

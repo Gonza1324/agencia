@@ -5,6 +5,7 @@ import {
   resetUserPasswordSchema,
   subagentAssignmentsSchema,
   updateUserSchema,
+  userAlertPreferencesSchema,
 } from "@/features/users/validations";
 
 describe("validaciones de usuarios", () => {
@@ -60,5 +61,23 @@ describe("validaciones de usuarios", () => {
         ],
       }).success,
     ).toBe(true);
+  });
+
+  it("valida preferencias de alertas de atraso", () => {
+    expect(
+      userAlertPreferencesSchema.safeParse({
+        userId: "439f5dc7-c91d-471b-a4e6-66e041035df8",
+        overdueAlertsEnabled: true,
+        overdueMinDays: "3",
+      }).success,
+    ).toBe(true);
+
+    expect(
+      userAlertPreferencesSchema.safeParse({
+        userId: "439f5dc7-c91d-471b-a4e6-66e041035df8",
+        overdueAlertsEnabled: true,
+        overdueMinDays: "31",
+      }).success,
+    ).toBe(false);
   });
 });

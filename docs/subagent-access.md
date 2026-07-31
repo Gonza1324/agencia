@@ -45,6 +45,8 @@ rol para que no puedan invocarse directamente desde la API.
 El rol `subagent` tiene un shell separado y es redirigido a `/mi-cuenta`.
 La pantalla mostrará:
 
+- una alerta prioritaria cuando alguna máquina asignada supere el umbral de
+  atraso configurado;
 - una tarjeta por máquina asignada;
 - saldo actual, diferenciando deuda y saldo a favor;
 - últimas rendiciones;
@@ -62,6 +64,13 @@ Desde Configuración, un propietario puede:
 - activar o suspender el acceso;
 - restablecer la contraseña;
 - asignar más de una máquina a la misma cuenta.
+- activar o desactivar las alertas de atraso de cada usuario y configurar su
+  umbral entre 1 y 30 días operativos.
+
+Las alertas de un usuario Subagente se calculan exclusivamente con sus vínculos
+activos. No revelan nombres, máquinas, rendiciones ni saldos de otros
+Subagentes. La configuración predeterminada es alerta activa desde el primer
+día operativo de atraso.
 
 Inactivar el usuario o el vínculo debe cortar el acceso inmediatamente sin
 borrar el historial.

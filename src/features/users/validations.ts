@@ -49,3 +49,13 @@ export const subagentAssignmentsSchema = z.object({
   userId: z.string().uuid("El usuario no es válido."),
   subagentIds: z.array(z.string().uuid("La máquina no es válida.")).max(50),
 });
+
+export const userAlertPreferencesSchema = z.object({
+  userId: z.string().uuid("El usuario no es válido."),
+  overdueAlertsEnabled: z.boolean(),
+  overdueMinDays: z.coerce
+    .number()
+    .int()
+    .min(1, "El aviso debe comenzar desde 1 día de atraso.")
+    .max(30, "El aviso no puede superar los 30 días de atraso."),
+});

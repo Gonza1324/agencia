@@ -35,6 +35,21 @@ Los cálculos se resuelven con la función
 El dashboard también muestra si la Caja sigue abierta, fue reabierta o si el
 último cierre registró diferencias, con acceso directo al cierre diario.
 
+## Alertas de rendiciones atrasadas
+
+Para los propietarios, los atrasos tienen una sección prioritaria debajo de
+los indicadores principales y antes del resumen de Caja. Allí se muestran
+todos los Subagentes activos que superan el umbral configurado, con su máquina,
+días operativos de atraso, última rendición y saldo de cuenta corriente.
+
+Cada propietario puede activar o desactivar sus alertas y elegir un umbral de
+entre 1 y 30 días operativos desde `Configuración > Usuarios`. Esta preferencia
+es personal: no modifica lo que ven los demás propietarios.
+
+La tarjeta de pendientes del encabezado también adopta un estado de peligro
+cuando existen rendiciones atrasadas. Desde la alerta se puede abrir el
+Subagente, consultar su cuenta corriente o registrar la rendición.
+
 ## Previsión de gastos
 
 El dashboard muestra las obligaciones vencidas y las que vencen dentro de los

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       attachments: {
@@ -1000,6 +1025,48 @@ export type Database = {
           },
         ]
       }
+      user_alert_preferences: {
+        Row: {
+          created_at: string
+          overdue_alerts_enabled: boolean
+          overdue_min_days: number
+          updated_at: string
+          updated_by: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          overdue_alerts_enabled?: boolean
+          overdue_min_days?: number
+          updated_at?: string
+          updated_by?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          overdue_alerts_enabled?: boolean
+          overdue_min_days?: number
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_alert_preferences_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_alert_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1240,6 +1307,14 @@ export type Database = {
         Args: { p_subagent_ids: string[]; p_user_id: string }
         Returns: undefined
       }
+      set_user_alert_preferences: {
+        Args: {
+          p_overdue_alerts_enabled: boolean
+          p_overdue_min_days: number
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       update_expense_obligation: {
         Args: {
           p_amount: number
@@ -1424,6 +1499,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       account_movement_direction: ["debit", "credit"],
