@@ -24,6 +24,18 @@ export const subagentSchema = z.object({
       .min(0, "El porcentaje no puede ser negativo")
       .max(100, "El porcentaje no puede superar el 100%"),
   ),
+  maquinolaOverdueAlertsEnabled: z.preprocess(
+    (value) => value === "on" || value === true,
+    z.boolean(),
+  ),
+  maquinolaOverdueMinDays: z.preprocess(
+    (value) => (value == null || value === "" ? 1 : Number(value)),
+    z
+      .number({ invalid_type_error: "Ingresá una cantidad válida" })
+      .int("Debe ser un número entero")
+      .min(1, "El mínimo es 1 día")
+      .max(30, "El máximo es 30 días"),
+  ),
   notes: z
     .string()
     .trim()

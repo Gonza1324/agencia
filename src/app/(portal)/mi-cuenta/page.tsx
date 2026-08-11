@@ -4,6 +4,7 @@ import {
   Calculator,
   MonitorCog,
   ReceiptText,
+  SquareStack,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -83,6 +84,35 @@ export default async function MyAccountPage() {
                         ? formatDateKey(alert.last_settlement_date)
                         : "sin rendiciones registradas"}
                     </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {portal.maquinolaAlerts.length ? (
+        <section className="rounded-xl border-2 border-violet-300 bg-violet-50 p-5 text-violet-950">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-violet-100 p-2 text-violet-800">
+              <AlertTriangle className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-700">
+                Alerta de Maquinolas
+              </p>
+              <h2 className="mt-1 text-xl font-semibold">
+                {portal.maquinolaAlerts.length === 1
+                  ? "Tenés una Maquinola atrasada"
+                  : `Tenés ${portal.maquinolaAlerts.length} Maquinolas atrasadas`}
+              </h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {portal.maquinolaAlerts.map((alert) => (
+                  <div key={alert.maquinola_id} className="rounded-lg border border-violet-200 bg-white/70 px-4 py-3">
+                    <p className="font-semibold">Maquinola {alert.maquinola_number}</p>
+                    <p className="mt-1 text-sm">{alert.delay_days} {alert.delay_days === 1 ? "día" : "días"} de atraso</p>
+                    <p className="mt-1 text-xs text-violet-700">Último cierre: {alert.last_settlement_date ? formatDateKey(alert.last_settlement_date) : "sin cierres registrados"}</p>
                   </div>
                 ))}
               </div>
@@ -172,6 +202,40 @@ function SubagentAccount({
           helper="Pagos y saldos a favor"
         />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <SquareStack className="h-5 w-5" aria-hidden="true" />
+            Mis Maquinolas
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {account.maquinolas.length ? (
+            <div className="space-y-5">
+              {account.maquinolas.map((unit) => (
+                <section key={unit.id} className="rounded-lg border">
+                  <div className="flex items-center justify-between border-b p-4">
+                    <div>
+                      <h3 className="font-semibold">Maquinola {unit.number}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">Sin comisión</p>
+                    </div>
+                    <Badge variant={unit.status === "active" ? "success" : "muted"}>{unit.status === "active" ? "Activa" : "Inactiva"}</Badge>
+                  </div>
+                  {unit.settlements.length ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[700px] text-sm">
+                        <thead className="bg-muted/60 text-left text-muted-foreground"><tr><th className="px-4 py-3">Fecha</th><th className="px-4 py-3 text-right">Venta</th><th className="px-4 py-3 text-right">Premios</th><th className="px-4 py-3 text-right">Esperado</th><th className="px-4 py-3 text-right">Recibido</th><th className="px-4 py-3 text-right">Deuda</th></tr></thead>
+                        <tbody>{unit.settlements.slice(0, 12).map((settlement) => <tr key={settlement.id} className="border-t"><td className="px-4 py-3">{formatDateKey(settlement.settlement_date)}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.sales_amount))}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.prizes_paid_amount))}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.expected_amount))}</td><td className="px-4 py-3 text-right font-medium">{formatMoney(Number(settlement.received_amount))}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.debt_amount))}</td></tr>)}</tbody>
+                      </table>
+                    </div>
+                  ) : <p className="p-5 text-sm text-muted-foreground">Todavía no hay cierres registrados.</p>}
+                </section>
+              ))}
+            </div>
+          ) : <p className="text-sm text-muted-foreground">No tenés Maquinolas asignadas.</p>}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <Card>

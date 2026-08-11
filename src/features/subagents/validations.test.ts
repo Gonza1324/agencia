@@ -15,6 +15,8 @@ describe("subagentSchema", () => {
       name: "Agencia Norte",
       machineCode: "MAQ-01",
       commissionPercentage: 12.5,
+      maquinolaOverdueAlertsEnabled: false,
+      maquinolaOverdueMinDays: 1,
       notes: "Turno tarde",
     });
   });

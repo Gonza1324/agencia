@@ -11,6 +11,7 @@ import {
   LogOut,
   ReceiptText,
   Settings,
+  SquareStack,
   UsersRound,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ import type { UserRole } from "@/types/domain";
 const iconMap = {
   dashboard: LayoutDashboard,
   settlements: ReceiptText,
+  maquinolas: SquareStack,
   subagents: UsersRound,
   cash: Banknote,
   expenses: CalendarClock,

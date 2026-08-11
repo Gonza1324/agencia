@@ -362,6 +362,7 @@ export type Database = {
           note: string | null
           owner_name: string | null
           related_expense_obligation_id: string | null
+          related_maquinola_settlement_id: string | null
           related_settlement_id: string | null
           related_subagent_account_movement_id: string | null
           transfer_group_id: string | null
@@ -385,6 +386,7 @@ export type Database = {
           note?: string | null
           owner_name?: string | null
           related_expense_obligation_id?: string | null
+          related_maquinola_settlement_id?: string | null
           related_settlement_id?: string | null
           related_subagent_account_movement_id?: string | null
           transfer_group_id?: string | null
@@ -408,6 +410,7 @@ export type Database = {
           note?: string | null
           owner_name?: string | null
           related_expense_obligation_id?: string | null
+          related_maquinola_settlement_id?: string | null
           related_settlement_id?: string | null
           related_subagent_account_movement_id?: string | null
           transfer_group_id?: string | null
@@ -452,6 +455,13 @@ export type Database = {
             columns: ["related_expense_obligation_id"]
             isOneToOne: false
             referencedRelation: "expense_obligations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_movements_related_maquinola_settlement_id_fkey"
+            columns: ["related_maquinola_settlement_id"]
+            isOneToOne: false
+            referencedRelation: "maquinola_settlements"
             referencedColumns: ["id"]
           },
           {
@@ -714,6 +724,247 @@ export type Database = {
           },
         ]
       }
+      maquinola_settlement_payments: {
+        Row: {
+          amount: number
+          cash_account_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          method: Database["public"]["Enums"]["payment_method"]
+          settlement_id: string
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          amount: number
+          cash_account_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method: Database["public"]["Enums"]["payment_method"]
+          settlement_id: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          amount?: number
+          cash_account_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: Database["public"]["Enums"]["payment_method"]
+          settlement_id?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maquinola_settlement_payments_cash_account_id_fkey"
+            columns: ["cash_account_id"]
+            isOneToOne: false
+            referencedRelation: "cash_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlement_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlement_payments_settlement_id_fkey"
+            columns: ["settlement_id"]
+            isOneToOne: false
+            referencedRelation: "maquinola_settlements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlement_payments_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maquinola_settlements: {
+        Row: {
+          business_day_id: string
+          created_at: string
+          created_by: string | null
+          debt_amount: number
+          expected_amount: number
+          id: string
+          maquinola_id: string
+          notes: string | null
+          overpayment_credit_amount: number
+          prize_credit_amount: number
+          prizes_paid_amount: number
+          received_amount: number
+          sales_amount: number
+          settlement_date: string
+          status: Database["public"]["Enums"]["settlement_status"]
+          subagent_id: string
+          updated_at: string
+          updated_by: string | null
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          business_day_id: string
+          created_at?: string
+          created_by?: string | null
+          debt_amount?: number
+          expected_amount: number
+          id?: string
+          maquinola_id: string
+          notes?: string | null
+          overpayment_credit_amount?: number
+          prize_credit_amount?: number
+          prizes_paid_amount: number
+          received_amount: number
+          sales_amount: number
+          settlement_date: string
+          status?: Database["public"]["Enums"]["settlement_status"]
+          subagent_id: string
+          updated_at?: string
+          updated_by?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          business_day_id?: string
+          created_at?: string
+          created_by?: string | null
+          debt_amount?: number
+          expected_amount?: number
+          id?: string
+          maquinola_id?: string
+          notes?: string | null
+          overpayment_credit_amount?: number
+          prize_credit_amount?: number
+          prizes_paid_amount?: number
+          received_amount?: number
+          sales_amount?: number
+          settlement_date?: string
+          status?: Database["public"]["Enums"]["settlement_status"]
+          subagent_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maquinola_settlements_business_day_id_fkey"
+            columns: ["business_day_id"]
+            isOneToOne: false
+            referencedRelation: "business_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlements_maquinola_id_fkey"
+            columns: ["maquinola_id"]
+            isOneToOne: false
+            referencedRelation: "maquinolas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlements_subagent_id_fkey"
+            columns: ["subagent_id"]
+            isOneToOne: false
+            referencedRelation: "subagents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinola_settlements_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maquinolas: {
+        Row: {
+          assigned_at: string
+          created_at: string
+          created_by: string | null
+          id: string
+          number: string
+          status: Database["public"]["Enums"]["record_status"]
+          subagent_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          assigned_at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          number: string
+          status?: Database["public"]["Enums"]["record_status"]
+          subagent_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          assigned_at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          number?: string
+          status?: Database["public"]["Enums"]["record_status"]
+          subagent_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maquinolas_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinolas_subagent_id_fkey"
+            columns: ["subagent_id"]
+            isOneToOne: false
+            referencedRelation: "subagents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maquinolas_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -825,6 +1076,7 @@ export type Database = {
           id: string
           notes: string | null
           related_cash_movement_id: string | null
+          related_maquinola_settlement_id: string | null
           related_settlement_id: string | null
           subagent_id: string
           type: Database["public"]["Enums"]["account_movement_type"]
@@ -841,6 +1093,7 @@ export type Database = {
           id?: string
           notes?: string | null
           related_cash_movement_id?: string | null
+          related_maquinola_settlement_id?: string | null
           related_settlement_id?: string | null
           subagent_id: string
           type: Database["public"]["Enums"]["account_movement_type"]
@@ -857,6 +1110,7 @@ export type Database = {
           id?: string
           notes?: string | null
           related_cash_movement_id?: string | null
+          related_maquinola_settlement_id?: string | null
           related_settlement_id?: string | null
           subagent_id?: string
           type?: Database["public"]["Enums"]["account_movement_type"]
@@ -877,6 +1131,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subagent_account_movements_related_maquinola_settlement_id_fkey"
+            columns: ["related_maquinola_settlement_id"]
+            isOneToOne: false
+            referencedRelation: "maquinola_settlements"
             referencedColumns: ["id"]
           },
           {
@@ -978,6 +1239,8 @@ export type Database = {
           created_by: string | null
           id: string
           machine_code: string
+          maquinola_overdue_alerts_enabled: boolean
+          maquinola_overdue_min_days: number
           name: string
           notes: string | null
           status: Database["public"]["Enums"]["record_status"]
@@ -990,6 +1253,8 @@ export type Database = {
           created_by?: string | null
           id?: string
           machine_code: string
+          maquinola_overdue_alerts_enabled?: boolean
+          maquinola_overdue_min_days?: number
           name: string
           notes?: string | null
           status?: Database["public"]["Enums"]["record_status"]
@@ -1002,6 +1267,8 @@ export type Database = {
           created_by?: string | null
           id?: string
           machine_code?: string
+          maquinola_overdue_alerts_enabled?: boolean
+          maquinola_overdue_min_days?: number
           name?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["record_status"]
@@ -1127,6 +1394,18 @@ export type Database = {
         }
         Returns: string
       }
+      create_maquinola_settlement: {
+        Args: {
+          p_bank_amount: number
+          p_cash_amount: number
+          p_maquinola_id: string
+          p_notes?: string
+          p_prizes_paid_amount: number
+          p_sales_amount: number
+          p_settlement_date: string
+        }
+        Returns: string
+      }
       create_subagent_account_movement: {
         Args: {
           p_amount: number
@@ -1201,6 +1480,23 @@ export type Database = {
           total_expense: number
           total_income: number
           total_withdrawals: number
+        }[]
+      }
+      get_maquinola_dashboard: {
+        Args: { p_date?: string }
+        Returns: {
+          dashboard_status: string
+          debt_today: number
+          delay_days: number
+          last_settlement_date: string
+          maquinola_id: string
+          maquinola_number: string
+          overdue_alerts_enabled: boolean
+          overdue_min_days: number
+          received_today: number
+          subagent_id: string
+          subagent_name: string
+          today_settlement_id: string
         }[]
       }
       get_period_report: {
@@ -1303,6 +1599,19 @@ export type Database = {
         }
         Returns: string
       }
+      replace_maquinola_settlement: {
+        Args: {
+          p_bank_amount: number
+          p_cash_amount: number
+          p_maquinola_id: string
+          p_notes?: string
+          p_previous_settlement_id: string
+          p_prizes_paid_amount: number
+          p_sales_amount: number
+          p_settlement_date: string
+        }
+        Returns: string
+      }
       set_subagent_user_links: {
         Args: { p_subagent_ids: string[]; p_user_id: string }
         Returns: undefined
@@ -1333,6 +1642,10 @@ export type Database = {
       }
       void_manual_cash_movement: {
         Args: { p_movement_id: string; p_reason: string }
+        Returns: undefined
+      }
+      void_maquinola_settlement: {
+        Args: { p_reason: string; p_settlement_id: string }
         Returns: undefined
       }
       void_subagent_account_movement: {

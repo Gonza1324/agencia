@@ -14,6 +14,10 @@ function getSubagentInput(formData: FormData) {
     name: formData.get("name"),
     machineCode: formData.get("machineCode"),
     commissionPercentage: formData.get("commissionPercentage"),
+    maquinolaOverdueAlertsEnabled: formData.get(
+      "maquinolaOverdueAlertsEnabled",
+    ),
+    maquinolaOverdueMinDays: formData.get("maquinolaOverdueMinDays"),
     notes: formData.get("notes"),
   });
 }
@@ -47,6 +51,9 @@ export async function createSubagentAction(
       name: parsedInput.data.name,
       machine_code: parsedInput.data.machineCode,
       commission_percentage: parsedInput.data.commissionPercentage,
+      maquinola_overdue_alerts_enabled:
+        parsedInput.data.maquinolaOverdueAlertsEnabled,
+      maquinola_overdue_min_days: parsedInput.data.maquinolaOverdueMinDays,
       notes: parsedInput.data.notes ?? null,
       created_by: user.id,
       updated_by: user.id,
@@ -89,6 +96,9 @@ export async function updateSubagentAction(
       name: parsedInput.data.name,
       machine_code: parsedInput.data.machineCode,
       commission_percentage: parsedInput.data.commissionPercentage,
+      maquinola_overdue_alerts_enabled:
+        parsedInput.data.maquinolaOverdueAlertsEnabled,
+      maquinola_overdue_min_days: parsedInput.data.maquinolaOverdueMinDays,
       notes: parsedInput.data.notes ?? null,
       updated_by: user.id,
     })
@@ -111,6 +121,8 @@ export async function updateSubagentAction(
   }
 
   revalidatePath("/subagentes");
+  revalidatePath("/dashboard");
+  revalidatePath("/mi-cuenta");
   revalidatePath(`/subagentes/${parsedId.data}`);
   redirect(`/subagentes/${parsedId.data}?updated=1`);
 }

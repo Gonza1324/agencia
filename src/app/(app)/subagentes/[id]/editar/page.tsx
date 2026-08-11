@@ -43,6 +43,9 @@ export default async function EditSubagentPage({
           name: subagent.name,
           machineCode: subagent.machine_code,
           commissionPercentage: subagent.commission_percentage,
+          maquinolaOverdueAlertsEnabled:
+            subagent.maquinola_overdue_alerts_enabled,
+          maquinolaOverdueMinDays: subagent.maquinola_overdue_min_days,
           notes: subagent.notes ?? "",
         }}
       />

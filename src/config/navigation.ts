@@ -17,6 +17,12 @@ export const navigationItems = [
     roles: operatorRoles,
   },
   {
+    href: "/maquinolas",
+    label: "Maquinolas",
+    icon: "maquinolas",
+    roles: operatorRoles,
+  },
+  {
     href: "/subagentes",
     label: "Subagentes",
     icon: "subagents",

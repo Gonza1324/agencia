@@ -50,6 +50,11 @@ La tarjeta de pendientes del encabezado también adopta un estado de peligro
 cuando existen rendiciones atrasadas. Desde la alerta se puede abrir el
 Subagente, consultar su cuenta corriente o registrar la rendición.
 
+Las Maquinolas tienen un bloque de alertas separado. Cada fila respeta la
+configuración del Subagente asignado y permite abrir la unidad o registrar su
+cierre. Los ingresos diarios del encabezado suman rendiciones de máquinas y
+cierres de Maquinolas.
+
 ## Previsión de gastos
 
 El dashboard muestra las obligaciones vencidas y las que vencen dentro de los

@@ -5,6 +5,8 @@ export type SubagentFormState = {
     commissionPercentage?: string[];
     name?: string[];
     machineCode?: string[];
+    maquinolaOverdueAlertsEnabled?: string[];
+    maquinolaOverdueMinDays?: string[];
     notes?: string[];
   };
 };

@@ -22,6 +22,8 @@ type SubagentFormProps = {
     name: string;
     machineCode: string;
     commissionPercentage: number;
+    maquinolaOverdueAlertsEnabled: boolean;
+    maquinolaOverdueMinDays: number;
     notes: string;
   };
 };
@@ -131,6 +133,45 @@ export function SubagentForm({ mode, subagent }: SubagentFormProps) {
           <FieldError errors={state.fieldErrors?.commissionPercentage} />
         </label>
       </div>
+
+      <fieldset className="rounded-lg border p-5">
+        <legend className="px-2 font-semibold">
+          Alertas de Maquinolas
+        </legend>
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            className="mt-1 h-4 w-4"
+            type="checkbox"
+            name="maquinolaOverdueAlertsEnabled"
+            defaultChecked={subagent?.maquinolaOverdueAlertsEnabled ?? true}
+          />
+          <span>
+            <span className="block text-sm font-medium">
+              Mostrar alertas de atraso
+            </span>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Aplica a todas las Maquinolas asignadas a este Subagente, tanto
+              en el dashboard interno como en su portal.
+            </span>
+          </span>
+        </label>
+        <label className="mt-4 block max-w-xs">
+          <span className="text-sm font-medium">Avisar desde</span>
+          <span className="mt-1 flex items-center gap-2">
+            <input
+              className="h-10 w-24 rounded-md border bg-background px-3"
+              type="number"
+              name="maquinolaOverdueMinDays"
+              min="1"
+              max="30"
+              defaultValue={subagent?.maquinolaOverdueMinDays ?? 1}
+              required
+            />
+            <span className="text-sm">días operativos</span>
+          </span>
+          <FieldError errors={state.fieldErrors?.maquinolaOverdueMinDays} />
+        </label>
+      </fieldset>
 
       <label className="block">
         <span className="text-sm font-medium">Observaciones</span>

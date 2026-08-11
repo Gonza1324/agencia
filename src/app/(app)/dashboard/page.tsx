@@ -10,6 +10,7 @@ import {
   Plus,
   ReceiptText,
   Scale,
+  SquareStack,
   TrendingDown,
   WalletCards,
   UsersRound,
@@ -77,6 +78,14 @@ export default async function DashboardPage() {
   const hasClosureDifference =
     Number(dashboard.closure?.cash_difference ?? 0) !== 0 ||
     Number(dashboard.closure?.bank_difference ?? 0) !== 0;
+  const maquinolaAlertRows = dashboard.maquinolaRows.filter(
+    (row) =>
+      row.overdue_alerts_enabled &&
+      row.delay_days >= row.overdue_min_days &&
+      ["late", "late_serious", "late_critical"].includes(
+        row.dashboard_status,
+      ),
+  );
 
   return (
     <div className="space-y-6">
@@ -99,7 +108,7 @@ export default async function DashboardPage() {
         </Badge>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         <MetricCard
           icon={UsersRound}
           label="Subagentes activos"
@@ -119,8 +128,20 @@ export default async function DashboardPage() {
         <MetricCard
           icon={CircleDollarSign}
           label="Ingresado hoy"
-          value={formatMoney(dashboard.receivedToday)}
-          helper="Importe total de rendiciones"
+          value={formatMoney(
+            dashboard.receivedToday + dashboard.maquinolaReceivedToday,
+          )}
+          helper="Máquinas más Maquinolas"
+        />
+        <MetricCard
+          icon={SquareStack}
+          label="Cierres de Maquinolas"
+          value={String(dashboard.maquinolaSettledToday)}
+          helper={
+            dashboard.maquinolaRows.length === 1
+              ? "1 Maquinola activa"
+              : `${dashboard.maquinolaRows.length} Maquinolas activas`
+          }
         />
         <MetricCard
           icon={AlertTriangle}
@@ -265,6 +286,60 @@ export default async function DashboardPage() {
             </div>
           </section>
         )
+      ) : null}
+
+      {dashboard.userIsOwner ? (
+        maquinolaAlertRows.length ? (
+          <section className="overflow-hidden rounded-xl border-2 border-violet-300 bg-violet-50">
+            <div className="flex flex-col gap-4 border-b border-violet-200 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-violet-100 p-2 text-violet-800">
+                  <AlertTriangle className="h-6 w-6" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-violet-700">
+                    Maquinolas atrasadas
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold">
+                    {maquinolaAlertRows.length}{" "}
+                    {maquinolaAlertRows.length === 1
+                      ? "Maquinola requiere seguimiento"
+                      : "Maquinolas requieren seguimiento"}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Cada alerta respeta el plazo configurado para su Subagente.
+                  </p>
+                </div>
+              </div>
+              <Link href="/subagentes" className="text-sm font-semibold text-primary hover:underline">
+                Configurar plazos
+              </Link>
+            </div>
+            <div className="max-h-[430px] divide-y overflow-y-auto bg-card/70">
+              {maquinolaAlertRows.map((row) => (
+                <div key={row.maquinola_id} className="flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link href={`/maquinolas/${row.maquinola_id}`} className="font-semibold text-primary hover:underline">
+                        Maquinola {row.maquinola_number}
+                      </Link>
+                      <span className="text-sm">{row.subagent_name}</span>
+                      <Badge variant={row.delay_days >= 3 ? "danger" : "warning"}>
+                        {row.delay_days} {row.delay_days === 1 ? "día" : "días"} de atraso
+                      </Badge>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Último cierre: {row.last_settlement_date ? formatDateKey(row.last_settlement_date) : "nunca rindió"}
+                    </p>
+                  </div>
+                  <Link href={`/maquinolas/cierres/nuevo?maquinola=${row.maquinola_id}`} className={cn(buttonVariants({ size: "sm" }))}>
+                    Registrar cierre
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null
       ) : null}
 
       <section className="rounded-lg border bg-card">

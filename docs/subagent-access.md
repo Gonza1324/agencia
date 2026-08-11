@@ -52,6 +52,7 @@ La pantalla mostrará:
 - últimas rendiciones;
 - movimientos de cuenta corriente;
 - datos de comisión y cálculo de cada rendición.
+- Maquinolas asignadas, sus cierres sin comisión y alertas de atraso propias.
 
 No verá la navegación administrativa.
 
@@ -71,6 +72,10 @@ Las alertas de un usuario Subagente se calculan exclusivamente con sus vínculos
 activos. No revelan nombres, máquinas, rendiciones ni saldos de otros
 Subagentes. La configuración predeterminada es alerta activa desde el primer
 día operativo de atraso.
+
+Las Maquinolas heredan el acceso del Subagente al que están asignadas. Sus
+deudas y saldos a favor se integran en la misma cuenta corriente general, pero
+los cierres se muestran en una sección separada y de solo lectura.
 
 Inactivar el usuario o el vínculo debe cortar el acceso inmediatamente sin
 borrar el historial.

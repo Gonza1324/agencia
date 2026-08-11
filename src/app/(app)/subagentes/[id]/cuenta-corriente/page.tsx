@@ -137,7 +137,9 @@ export default async function SubagentAccountPage({
                 {data.movements.map((movement) => {
                   const isVoided = movement.voided_at !== null;
                   const canVoid =
-                    !isVoided && movement.related_settlement_id === null;
+                    !isVoided &&
+                    movement.related_settlement_id === null &&
+                    movement.related_maquinola_settlement_id === null;
 
                   return (
                     <li
@@ -184,6 +186,18 @@ export default async function SubagentAccountPage({
                         >
                           Ver rendición del{" "}
                           {formatDateKey(movement.settlement.settlement_date)}
+                        </Link>
+                      ) : null}
+
+                      {movement.maquinola_settlement ? (
+                        <Link
+                          href={`/maquinolas/cierres/${movement.maquinola_settlement.id}`}
+                          className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
+                        >
+                          Ver cierre de Maquinola {movement.maquinola_settlement.maquinola.number} del{" "}
+                          {formatDateKey(
+                            movement.maquinola_settlement.settlement_date,
+                          )}
                         </Link>
                       ) : null}
 

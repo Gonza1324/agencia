@@ -52,6 +52,9 @@ La base incluye:
 - Cabeceras de seguridad y endpoint de salud.
 - Administración interna de usuarios, contraseñas temporales y estados.
 - Roles efectivos de propietario, operador y visor con RLS.
+- Módulo de Maquinolas asignadas a Subagentes, sin comisión.
+- Cierres diarios de Maquinolas con efectivo, banco, premios y cuenta corriente.
+- Alertas de Maquinolas configurables por Subagente en días operativos.
 
 ## Requisitos
 

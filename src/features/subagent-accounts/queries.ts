@@ -43,7 +43,7 @@ export const getSubagentAccountPageData = cache(async (subagentId: string) => {
       supabase
         .from("subagent_account_movements")
         .select(
-          "*, business_day:business_days(date), settlement:daily_settlements(id, settlement_date, status)",
+          "*, business_day:business_days(date), settlement:daily_settlements(id, settlement_date, status), maquinola_settlement:maquinola_settlements(id, settlement_date, status, maquinola:maquinolas(number))",
         )
         .eq("subagent_id", parsedId.data)
         .order("created_at", { ascending: false })

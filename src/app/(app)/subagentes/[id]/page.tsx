@@ -194,6 +194,20 @@ export default async function SubagentDetailPage({
                 </dd>
               </div>
               <div className="sm:col-span-2">
+                <dt className="text-sm text-muted-foreground">
+                  Alertas de Maquinolas
+                </dt>
+                <dd className="mt-1 font-medium">
+                  {subagent.maquinola_overdue_alerts_enabled
+                    ? `Desde ${subagent.maquinola_overdue_min_days} día${
+                        subagent.maquinola_overdue_min_days === 1 ? "" : "s"
+                      } operativo${
+                        subagent.maquinola_overdue_min_days === 1 ? "" : "s"
+                      } de atraso`
+                    : "Desactivadas"}
+                </dd>
+              </div>
+              <div className="sm:col-span-2">
                 <dt className="text-sm text-muted-foreground">Notas</dt>
                 <dd className="mt-1 whitespace-pre-wrap">
                   {subagent.notes || "Sin notas."}

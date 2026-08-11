@@ -46,6 +46,7 @@ export const getDailyDashboard = cache(async () => {
     cashSummaryResult,
     dailyReportResult,
     alertPreferencesResult,
+    maquinolaDashboardResult,
   ] = await Promise.all([
     supabase.rpc("get_subagent_dashboard", { p_date: operationalDate }),
     businessDay
@@ -73,6 +74,7 @@ export const getDailyDashboard = cache(async () => {
       .select("overdue_alerts_enabled, overdue_min_days")
       .eq("user_id", user.id)
       .maybeSingle(),
+    supabase.rpc("get_maquinola_dashboard", { p_date: operationalDate }),
   ]);
 
   if (dashboardResult.error) {
@@ -89,7 +91,8 @@ export const getDailyDashboard = cache(async () => {
     expensesResult.error ||
     cashSummaryResult.error ||
     dailyReportResult.error ||
-    alertPreferencesResult.error
+    alertPreferencesResult.error ||
+    maquinolaDashboardResult.error
   ) {
     throw new Error("No se pudo calcular el resumen financiero diario.");
   }
@@ -107,6 +110,14 @@ export const getDailyDashboard = cache(async () => {
     ["late", "late_serious", "late_critical"].includes(row.dashboard_status),
   ).length;
   const receivedToday = rows.reduce(
+    (total, row) => total + Number(row.received_today),
+    0,
+  );
+  const maquinolaRows = maquinolaDashboardResult.data;
+  const maquinolaSettledToday = maquinolaRows.filter((row) =>
+    ["settled", "settled_with_debt"].includes(row.dashboard_status),
+  ).length;
+  const maquinolaReceivedToday = maquinolaRows.reduce(
     (total, row) => total + Number(row.received_today),
     0,
   );
@@ -134,6 +145,9 @@ export const getDailyDashboard = cache(async () => {
     operationalDate,
     pendingToday,
     receivedToday,
+    maquinolaReceivedToday,
+    maquinolaRows,
+    maquinolaSettledToday,
     rows,
     settledToday,
     userCanOperate,
