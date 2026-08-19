@@ -60,16 +60,17 @@ export default async function ExpensesPage({
             Controlá vencimientos y registrá el pago en Caja cuando corresponda.
           </p>
         </div>
-        <Link href="/gastos/nuevo" className={cn(buttonVariants())}>
+        <Link
+          href="/gastos/nuevo"
+          prefetch={false}
+          className={cn(buttonVariants())}
+        >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Nueva obligación
         </Link>
       </header>
 
-      {params.created ||
-      params.paid ||
-      params.updated ||
-      params.cancelled ? (
+      {params.created || params.paid || params.updated || params.cancelled ? (
         <p className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           {params.paid
             ? "El gasto se pagó y se descontó de Caja correctamente."
@@ -217,6 +218,7 @@ export default async function ExpensesPage({
                         <div className="flex items-start justify-end gap-2">
                           <Link
                             href={`/gastos/${obligation.id}/editar`}
+                            prefetch={false}
                             className={cn(
                               buttonVariants({
                                 size: "sm",
@@ -237,10 +239,7 @@ export default async function ExpensesPage({
                                 "cursor-pointer list-none text-destructive",
                               )}
                             >
-                              <XCircle
-                                className="h-4 w-4"
-                                aria-hidden="true"
-                              />
+                              <XCircle className="h-4 w-4" aria-hidden="true" />
                               Cancelar
                             </summary>
                             <CancelExpenseForm id={obligation.id} />

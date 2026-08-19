@@ -82,9 +82,7 @@ export default async function DashboardPage() {
     (row) =>
       row.overdue_alerts_enabled &&
       row.delay_days >= row.overdue_min_days &&
-      ["late", "late_serious", "late_critical"].includes(
-        row.dashboard_status,
-      ),
+      ["late", "late_serious", "late_critical"].includes(row.dashboard_status),
   );
 
   return (
@@ -199,6 +197,7 @@ export default async function DashboardPage() {
               </div>
               <Link
                 href="/configuracion/usuarios"
+                prefetch={false}
                 className="text-sm font-semibold text-primary hover:underline"
               >
                 Configurar mis alertas
@@ -220,6 +219,7 @@ export default async function DashboardPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
                           href={`/subagentes/${row.subagent_id}`}
+                          prefetch={false}
                           className="font-semibold text-primary hover:underline"
                         >
                           {row.subagent_name}
@@ -247,6 +247,7 @@ export default async function DashboardPage() {
                     <div className="flex shrink-0 flex-wrap gap-2">
                       <Link
                         href={`/subagentes/${row.subagent_id}/cuenta-corriente`}
+                        prefetch={false}
                         className={cn(
                           buttonVariants({ size: "sm", variant: "secondary" }),
                         )}
@@ -256,6 +257,7 @@ export default async function DashboardPage() {
                       {dashboard.userCanOperate ? (
                         <Link
                           href="/rendiciones/nueva"
+                          prefetch={false}
                           className={cn(buttonVariants({ size: "sm" }))}
                         >
                           Registrar rendición
@@ -311,28 +313,49 @@ export default async function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <Link href="/subagentes" className="text-sm font-semibold text-primary hover:underline">
+              <Link
+                href="/subagentes"
+                prefetch={false}
+                className="text-sm font-semibold text-primary hover:underline"
+              >
                 Configurar plazos
               </Link>
             </div>
             <div className="max-h-[430px] divide-y overflow-y-auto bg-card/70">
               {maquinolaAlertRows.map((row) => (
-                <div key={row.maquinola_id} className="flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <div
+                  key={row.maquinola_id}
+                  className="flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
+                >
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Link href={`/maquinolas/${row.maquinola_id}`} className="font-semibold text-primary hover:underline">
+                      <Link
+                        href={`/maquinolas/${row.maquinola_id}`}
+                        prefetch={false}
+                        className="font-semibold text-primary hover:underline"
+                      >
                         Maquinola {row.maquinola_number}
                       </Link>
                       <span className="text-sm">{row.subagent_name}</span>
-                      <Badge variant={row.delay_days >= 3 ? "danger" : "warning"}>
-                        {row.delay_days} {row.delay_days === 1 ? "día" : "días"} de atraso
+                      <Badge
+                        variant={row.delay_days >= 3 ? "danger" : "warning"}
+                      >
+                        {row.delay_days} {row.delay_days === 1 ? "día" : "días"}{" "}
+                        de atraso
                       </Badge>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Último cierre: {row.last_settlement_date ? formatDateKey(row.last_settlement_date) : "nunca rindió"}
+                      Último cierre:{" "}
+                      {row.last_settlement_date
+                        ? formatDateKey(row.last_settlement_date)
+                        : "nunca rindió"}
                     </p>
                   </div>
-                  <Link href={`/maquinolas/cierres/nuevo?maquinola=${row.maquinola_id}`} className={cn(buttonVariants({ size: "sm" }))}>
+                  <Link
+                    href={`/maquinolas/cierres/nuevo?maquinola=${row.maquinola_id}`}
+                    prefetch={false}
+                    className={cn(buttonVariants({ size: "sm" }))}
+                  >
                     Registrar cierre
                   </Link>
                 </div>
@@ -354,6 +377,7 @@ export default async function DashboardPage() {
             <div className="flex flex-wrap gap-2">
               <Link
                 href="/rendiciones/nueva"
+                prefetch={false}
                 className={cn(buttonVariants({ size: "sm" }))}
               >
                 <ReceiptText className="h-4 w-4" aria-hidden="true" />
@@ -361,6 +385,7 @@ export default async function DashboardPage() {
               </Link>
               <Link
                 href="/caja/nuevo"
+                prefetch={false}
                 className={cn(
                   buttonVariants({ size: "sm", variant: "secondary" }),
                 )}
@@ -370,6 +395,7 @@ export default async function DashboardPage() {
               </Link>
               <Link
                 href="/subagentes"
+                prefetch={false}
                 className={cn(
                   buttonVariants({ size: "sm", variant: "secondary" }),
                 )}
@@ -473,6 +499,7 @@ export default async function DashboardPage() {
             </div>
             <Link
               href="/cierre-diario"
+              prefetch={false}
               className="text-sm font-semibold text-primary hover:underline"
             >
               Ir al cierre diario
@@ -505,6 +532,7 @@ export default async function DashboardPage() {
           {dashboard.userCanOperate ? (
             <Link
               href="/gastos"
+              prefetch={false}
               className="text-sm font-semibold text-primary hover:underline"
             >
               Administrar gastos
@@ -588,6 +616,7 @@ export default async function DashboardPage() {
                 <Link
                   key={expense.id}
                   href={`/gastos/${expense.id}/editar`}
+                  prefetch={false}
                   className="flex flex-col gap-3 px-5 py-4 transition-colors hover:bg-muted/50 sm:flex-row sm:items-center sm:justify-between"
                 >
                   {content}
@@ -650,6 +679,7 @@ export default async function DashboardPage() {
                       <td className="px-5 py-4">
                         <Link
                           href={`/subagentes/${row.subagent_id}`}
+                          prefetch={false}
                           className="font-medium text-primary hover:underline"
                         >
                           {row.subagent_name}
@@ -696,6 +726,7 @@ export default async function DashboardPage() {
             </p>
             <Link
               href="/subagentes"
+              prefetch={false}
               className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
             >
               Ir a Subagentes

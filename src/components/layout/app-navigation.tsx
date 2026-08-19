@@ -51,6 +51,7 @@ export function DesktopNavigation({ userRole }: { userRole: UserRole }) {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             aria-current={active ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
@@ -96,6 +97,7 @@ export function MobileNavigation({
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex min-w-[76px] flex-1 flex-col items-center gap-1 px-2 py-2 text-[11px] font-medium",

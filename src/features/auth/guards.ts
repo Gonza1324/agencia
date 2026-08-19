@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
   canAccessInternalApp,
@@ -6,7 +8,7 @@ import {
 } from "@/lib/permissions";
 import type { UserRole } from "@/types/domain";
 
-async function requireProfile() {
+export const requireProfile = cache(async () => {
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
@@ -32,7 +34,7 @@ async function requireProfile() {
     supabase,
     user,
   };
-}
+});
 
 export async function requireInternalUser() {
   const context = await requireProfile();

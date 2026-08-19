@@ -67,6 +67,7 @@ export default async function SettlementsPage({
         </div>
         <Link
           href="/rendiciones/nueva"
+          prefetch={false}
           className={cn(buttonVariants(), "self-start md:self-auto")}
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
@@ -155,6 +156,7 @@ export default async function SettlementsPage({
                     <td className="px-5 py-4 text-right">
                       <Link
                         href={`/rendiciones/${settlement.id}`}
+                        prefetch={false}
                         className="font-medium text-primary hover:underline"
                       >
                         Ver detalle
