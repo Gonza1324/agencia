@@ -1546,6 +1546,16 @@ export type Database = {
           subagent_name: string
         }[]
       }
+      get_settlement_gap_summary: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          machine_code: string
+          missing_dates: string[]
+          missing_days: number
+          subagent_id: string
+          subagent_name: string
+        }[]
+      }
       get_subagent_account_summary: {
         Args: { p_subagent_id: string }
         Returns: {
