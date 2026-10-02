@@ -360,6 +360,7 @@ export async function updateUserAlertPreferencesAction(
     userId: formData.get("userId"),
     overdueAlertsEnabled: formData.get("overdueAlertsEnabled") === "on",
     overdueMinDays: formData.get("overdueMinDays"),
+    overdueLookbackDays: formData.get("overdueLookbackDays"),
   });
 
   if (!parsed.success) {
@@ -377,6 +378,7 @@ export async function updateUserAlertPreferencesAction(
     p_user_id: parsed.data.userId,
     p_overdue_alerts_enabled: parsed.data.overdueAlertsEnabled,
     p_overdue_min_days: parsed.data.overdueMinDays,
+    p_overdue_lookback_days: parsed.data.overdueLookbackDays,
   });
 
   if (error) {

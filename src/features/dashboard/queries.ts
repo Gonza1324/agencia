@@ -5,6 +5,12 @@ import {
   addDaysToDateKey,
   calculateExpenseForecast,
 } from "@/features/dashboard/expense-forecast";
+import {
+  buildHistoricalOverdueAlerts,
+  DEFAULT_OVERDUE_LOOKBACK_DAYS,
+  getOverdueLookbackStart,
+  MAX_OVERDUE_LOOKBACK_DAYS,
+} from "@/features/dashboard/overdue-alerts";
 import { getArgentinaDateKey, isWorkingDay } from "@/lib/operational-days";
 import { canOperate } from "@/lib/permissions";
 import type { UserRole } from "@/types/domain";
@@ -16,6 +22,10 @@ export const getDailyDashboard = cache(async () => {
   const { profile, supabase, user } = await requireInternalUser();
   const userCanOperate = canOperate(profile.role as UserRole);
   const expenseHorizonDate = addDaysToDateKey(operationalDate, 7);
+  const maximumAlertLookbackStart = getOverdueLookbackStart(
+    operationalDate,
+    MAX_OVERDUE_LOOKBACK_DAYS,
+  );
 
   let businessDay = null;
 
@@ -46,6 +56,7 @@ export const getDailyDashboard = cache(async () => {
     cashSummaryResult,
     dailyReportResult,
     alertPreferencesResult,
+    gapSummaryResult,
     maquinolaDashboardResult,
   ] = await Promise.all([
     supabase.rpc("get_subagent_dashboard", { p_date: operationalDate }),
@@ -71,9 +82,13 @@ export const getDailyDashboard = cache(async () => {
     }),
     supabase
       .from("user_alert_preferences")
-      .select("overdue_alerts_enabled, overdue_min_days")
+      .select("overdue_alerts_enabled, overdue_min_days, overdue_lookback_days")
       .eq("user_id", user.id)
       .maybeSingle(),
+    supabase.rpc("get_settlement_gap_summary", {
+      p_from: maximumAlertLookbackStart,
+      p_to: operationalDate,
+    }),
     supabase.rpc("get_maquinola_dashboard", { p_date: operationalDate }),
   ]);
 
@@ -92,6 +107,7 @@ export const getDailyDashboard = cache(async () => {
     cashSummaryResult.error ||
     dailyReportResult.error ||
     alertPreferencesResult.error ||
+    gapSummaryResult.error ||
     maquinolaDashboardResult.error
   ) {
     throw new Error("No se pudo calcular el resumen financiero diario.");
@@ -106,9 +122,19 @@ export const getDailyDashboard = cache(async () => {
   const pendingToday = rows.filter(
     (row) => row.dashboard_status === "pending",
   ).length;
-  const alertCount = rows.filter((row) =>
-    ["late", "late_serious", "late_critical"].includes(row.dashboard_status),
-  ).length;
+  const alertPreferences = alertPreferencesResult.data ?? {
+    overdue_alerts_enabled: true,
+    overdue_lookback_days: DEFAULT_OVERDUE_LOOKBACK_DAYS,
+    overdue_min_days: 1,
+  };
+  const alertRows = alertPreferences.overdue_alerts_enabled
+    ? buildHistoricalOverdueAlerts(
+        rows,
+        gapSummaryResult.data,
+        alertPreferences,
+        operationalDate,
+      )
+    : [];
   const receivedToday = rows.reduce(
     (total, row) => total + Number(row.received_today),
     0,
@@ -131,11 +157,9 @@ export const getDailyDashboard = cache(async () => {
   );
 
   return {
-    alertPreferences: alertPreferencesResult.data ?? {
-      overdue_alerts_enabled: true,
-      overdue_min_days: 1,
-    },
-    alertCount,
+    alertPreferences,
+    alertCount: alertRows.length,
+    alertRows,
     businessDay,
     cashSummary,
     closure: closureResult.data,

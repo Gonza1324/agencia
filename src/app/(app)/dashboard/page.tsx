@@ -66,12 +66,7 @@ const statusPresentation: Record<
 
 export default async function DashboardPage() {
   const dashboard = await getDailyDashboard();
-  const alertRows = dashboard.rows.filter((row) =>
-    ["late", "late_serious", "late_critical"].includes(row.dashboard_status),
-  );
-  const configuredAlertRows = alertRows.filter(
-    (row) => row.delay_days >= dashboard.alertPreferences.overdue_min_days,
-  );
+  const configuredAlertRows = dashboard.alertRows;
   const criticalAlertCount = configuredAlertRows.filter(
     (row) => row.dashboard_status === "late_critical",
   ).length;
@@ -187,7 +182,8 @@ export default async function DashboardPage() {
                     {dashboard.alertPreferences.overdue_min_days === 1
                       ? "día operativo"
                       : "días operativos"}{" "}
-                    de atraso
+                    sin rendir dentro de los últimos{" "}
+                    {dashboard.alertPreferences.overdue_lookback_days} días
                     {criticalAlertCount
                       ? ` · ${criticalAlertCount} en estado crítico`
                       : ""}
@@ -232,7 +228,9 @@ export default async function DashboardPage() {
                           className={presentation.badgeClassName}
                         >
                           {row.delay_days}{" "}
-                          {row.delay_days === 1 ? "día" : "días"} de atraso
+                          {row.delay_days === 1
+                            ? "cierre faltante"
+                            : "cierres faltantes"}
                         </Badge>
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">
@@ -242,6 +240,16 @@ export default async function DashboardPage() {
                           : "nunca rindió"}{" "}
                         · Saldo conocido:{" "}
                         {formatMoney(Number(row.known_balance))}
+                      </p>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Fechas pendientes:{" "}
+                        {row.missing_dates
+                          .slice(0, 6)
+                          .map((date) => formatDateKey(date))
+                          .join(", ")}
+                        {row.missing_dates.length > 6
+                          ? ` y ${row.missing_dates.length - 6} más`
+                          : ""}
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
@@ -281,9 +289,10 @@ export default async function DashboardPage() {
                 Ningún Subagente alcanzó el umbral configurado de{" "}
                 {dashboard.alertPreferences.overdue_min_days}{" "}
                 {dashboard.alertPreferences.overdue_min_days === 1
-                  ? "día operativo"
-                  : "días operativos"}
-                .
+                  ? "cierre faltante"
+                  : "cierres faltantes"}{" "}
+                dentro de los últimos{" "}
+                {dashboard.alertPreferences.overdue_lookback_days} días.
               </p>
             </div>
           </section>

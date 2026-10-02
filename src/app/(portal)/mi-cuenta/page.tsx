@@ -63,9 +63,10 @@ export default async function MyAccountPage() {
                 La Agencia configuró el aviso desde{" "}
                 {portal.alertPreferences.overdue_min_days}{" "}
                 {portal.alertPreferences.overdue_min_days === 1
-                  ? "día operativo"
-                  : "días operativos"}{" "}
-                de atraso.
+                  ? "cierre faltante"
+                  : "cierres faltantes"}{" "}
+                dentro de los últimos{" "}
+                {portal.alertPreferences.overdue_lookback_days} días.
               </p>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {portal.alerts.map((alert) => (
@@ -76,13 +77,19 @@ export default async function MyAccountPage() {
                     <p className="font-semibold">{alert.subagent_name}</p>
                     <p className="mt-1 text-sm">
                       Máquina {alert.machine_code} · {alert.delay_days}{" "}
-                      {alert.delay_days === 1 ? "día" : "días"} de atraso
+                      {alert.delay_days === 1
+                        ? "cierre faltante"
+                        : "cierres faltantes"}
                     </p>
                     <p className="mt-1 text-xs text-red-700">
-                      Última rendición:{" "}
-                      {alert.last_settlement_date
-                        ? formatDateKey(alert.last_settlement_date)
-                        : "sin rendiciones registradas"}
+                      Fechas pendientes:{" "}
+                      {alert.missing_dates
+                        .slice(0, 6)
+                        .map((date) => formatDateKey(date))
+                        .join(", ")}
+                      {alert.missing_dates.length > 6
+                        ? ` y ${alert.missing_dates.length - 6} más`
+                        : ""}
                     </p>
                   </div>
                 ))}
@@ -109,10 +116,23 @@ export default async function MyAccountPage() {
               </h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {portal.maquinolaAlerts.map((alert) => (
-                  <div key={alert.maquinola_id} className="rounded-lg border border-violet-200 bg-white/70 px-4 py-3">
-                    <p className="font-semibold">Maquinola {alert.maquinola_number}</p>
-                    <p className="mt-1 text-sm">{alert.delay_days} {alert.delay_days === 1 ? "día" : "días"} de atraso</p>
-                    <p className="mt-1 text-xs text-violet-700">Último cierre: {alert.last_settlement_date ? formatDateKey(alert.last_settlement_date) : "sin cierres registrados"}</p>
+                  <div
+                    key={alert.maquinola_id}
+                    className="rounded-lg border border-violet-200 bg-white/70 px-4 py-3"
+                  >
+                    <p className="font-semibold">
+                      Maquinola {alert.maquinola_number}
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {alert.delay_days}{" "}
+                      {alert.delay_days === 1 ? "día" : "días"} de atraso
+                    </p>
+                    <p className="mt-1 text-xs text-violet-700">
+                      Último cierre:{" "}
+                      {alert.last_settlement_date
+                        ? formatDateKey(alert.last_settlement_date)
+                        : "sin cierres registrados"}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -218,22 +238,74 @@ function SubagentAccount({
                   <div className="flex items-center justify-between border-b p-4">
                     <div>
                       <h3 className="font-semibold">Maquinola {unit.number}</h3>
-                      <p className="mt-1 text-xs text-muted-foreground">Sin comisión</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Sin comisión
+                      </p>
                     </div>
-                    <Badge variant={unit.status === "active" ? "success" : "muted"}>{unit.status === "active" ? "Activa" : "Inactiva"}</Badge>
+                    <Badge
+                      variant={unit.status === "active" ? "success" : "muted"}
+                    >
+                      {unit.status === "active" ? "Activa" : "Inactiva"}
+                    </Badge>
                   </div>
                   {unit.settlements.length ? (
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[700px] text-sm">
-                        <thead className="bg-muted/60 text-left text-muted-foreground"><tr><th className="px-4 py-3">Fecha</th><th className="px-4 py-3 text-right">Venta</th><th className="px-4 py-3 text-right">Premios</th><th className="px-4 py-3 text-right">Esperado</th><th className="px-4 py-3 text-right">Recibido</th><th className="px-4 py-3 text-right">Deuda</th></tr></thead>
-                        <tbody>{unit.settlements.slice(0, 12).map((settlement) => <tr key={settlement.id} className="border-t"><td className="px-4 py-3">{formatDateKey(settlement.settlement_date)}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.sales_amount))}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.prizes_paid_amount))}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.expected_amount))}</td><td className="px-4 py-3 text-right font-medium">{formatMoney(Number(settlement.received_amount))}</td><td className="px-4 py-3 text-right">{formatMoney(Number(settlement.debt_amount))}</td></tr>)}</tbody>
+                        <thead className="bg-muted/60 text-left text-muted-foreground">
+                          <tr>
+                            <th className="px-4 py-3">Fecha</th>
+                            <th className="px-4 py-3 text-right">Venta</th>
+                            <th className="px-4 py-3 text-right">Premios</th>
+                            <th className="px-4 py-3 text-right">Esperado</th>
+                            <th className="px-4 py-3 text-right">Recibido</th>
+                            <th className="px-4 py-3 text-right">Deuda</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {unit.settlements.slice(0, 12).map((settlement) => (
+                            <tr key={settlement.id} className="border-t">
+                              <td className="px-4 py-3">
+                                {formatDateKey(settlement.settlement_date)}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                {formatMoney(Number(settlement.sales_amount))}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                {formatMoney(
+                                  Number(settlement.prizes_paid_amount),
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                {formatMoney(
+                                  Number(settlement.expected_amount),
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right font-medium">
+                                {formatMoney(
+                                  Number(settlement.received_amount),
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                {formatMoney(Number(settlement.debt_amount))}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
                       </table>
                     </div>
-                  ) : <p className="p-5 text-sm text-muted-foreground">Todavía no hay cierres registrados.</p>}
+                  ) : (
+                    <p className="p-5 text-sm text-muted-foreground">
+                      Todavía no hay cierres registrados.
+                    </p>
+                  )}
                 </section>
               ))}
             </div>
-          ) : <p className="text-sm text-muted-foreground">No tenés Maquinolas asignadas.</p>}
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No tenés Maquinolas asignadas.
+            </p>
+          )}
         </CardContent>
       </Card>
 

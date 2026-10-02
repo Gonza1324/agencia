@@ -1296,6 +1296,7 @@ export type Database = {
         Row: {
           created_at: string
           overdue_alerts_enabled: boolean
+          overdue_lookback_days: number
           overdue_min_days: number
           updated_at: string
           updated_by: string | null
@@ -1304,6 +1305,7 @@ export type Database = {
         Insert: {
           created_at?: string
           overdue_alerts_enabled?: boolean
+          overdue_lookback_days?: number
           overdue_min_days?: number
           updated_at?: string
           updated_by?: string | null
@@ -1312,6 +1314,7 @@ export type Database = {
         Update: {
           created_at?: string
           overdue_alerts_enabled?: boolean
+          overdue_lookback_days?: number
           overdue_min_days?: number
           updated_at?: string
           updated_by?: string | null
@@ -1629,6 +1632,7 @@ export type Database = {
       set_user_alert_preferences: {
         Args: {
           p_overdue_alerts_enabled: boolean
+          p_overdue_lookback_days: number
           p_overdue_min_days: number
           p_user_id: string
         }

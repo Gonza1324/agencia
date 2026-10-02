@@ -21,6 +21,7 @@ import type { ProfileStatus, UserRole } from "@/types/domain";
 type UserManagementCardProps = {
   alertPreferences: {
     overdue_alerts_enabled: boolean;
+    overdue_lookback_days: number;
     overdue_min_days: number;
   };
   assignedSubagentIds: string[];
@@ -197,6 +198,7 @@ export function UserManagementCard({
       {user.role === "owner_admin" || user.role === "subagent" ? (
         <UserAlertPreferencesForm
           enabled={alertPreferences.overdue_alerts_enabled}
+          lookbackDays={alertPreferences.overdue_lookback_days}
           minimumDays={alertPreferences.overdue_min_days}
           role={user.role}
           userId={user.id}

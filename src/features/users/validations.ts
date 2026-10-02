@@ -58,4 +58,9 @@ export const userAlertPreferencesSchema = z.object({
     .int()
     .min(1, "El aviso debe comenzar desde 1 día de atraso.")
     .max(30, "El aviso no puede superar los 30 días de atraso."),
+  overdueLookbackDays: z.coerce
+    .number()
+    .int()
+    .min(7, "El período de revisión debe ser de al menos 7 días.")
+    .max(180, "El período de revisión no puede superar los 180 días."),
 });

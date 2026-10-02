@@ -14,11 +14,13 @@ import type { UserRole } from "@/types/domain";
 
 export function UserAlertPreferencesForm({
   enabled,
+  lookbackDays,
   minimumDays,
   role,
   userId,
 }: {
   enabled: boolean;
+  lookbackDays: number;
   minimumDays: number;
   role: UserRole;
   userId: string;
@@ -70,6 +72,28 @@ export function UserAlertPreferencesForm({
               required
             />
             <span className="text-sm">días operativos de atraso</span>
+          </span>
+        </label>
+
+        <label className="block max-w-md">
+          <span className="text-xs font-medium text-muted-foreground">
+            Revisar faltantes de los últimos
+          </span>
+          <span className="mt-1 flex items-center gap-2">
+            <input
+              className="h-9 w-24 rounded-md border bg-background px-3 text-sm"
+              name="overdueLookbackDays"
+              type="number"
+              min={7}
+              max={180}
+              defaultValue={lookbackDays}
+              required
+            />
+            <span className="text-sm">días calendario</span>
+          </span>
+          <span className="mt-1 block text-xs text-muted-foreground">
+            Un cierre faltante seguirá visible aunque existan rendiciones
+            posteriores.
           </span>
         </label>
 

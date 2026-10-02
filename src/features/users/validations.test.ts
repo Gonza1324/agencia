@@ -68,6 +68,7 @@ describe("validaciones de usuarios", () => {
       userAlertPreferencesSchema.safeParse({
         userId: "439f5dc7-c91d-471b-a4e6-66e041035df8",
         overdueAlertsEnabled: true,
+        overdueLookbackDays: "45",
         overdueMinDays: "3",
       }).success,
     ).toBe(true);
@@ -76,7 +77,17 @@ describe("validaciones de usuarios", () => {
       userAlertPreferencesSchema.safeParse({
         userId: "439f5dc7-c91d-471b-a4e6-66e041035df8",
         overdueAlertsEnabled: true,
+        overdueLookbackDays: "45",
         overdueMinDays: "31",
+      }).success,
+    ).toBe(false);
+
+    expect(
+      userAlertPreferencesSchema.safeParse({
+        userId: "439f5dc7-c91d-471b-a4e6-66e041035df8",
+        overdueAlertsEnabled: true,
+        overdueLookbackDays: "181",
+        overdueMinDays: "1",
       }).success,
     ).toBe(false);
   });

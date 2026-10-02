@@ -90,6 +90,7 @@ export default async function UsersPage() {
             alertPreferences={
               user.alert_preferences ?? {
                 overdue_alerts_enabled: true,
+                overdue_lookback_days: 45,
                 overdue_min_days: 1,
               }
             }

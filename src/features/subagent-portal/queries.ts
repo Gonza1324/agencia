@@ -1,6 +1,11 @@
 import { cache } from "react";
 
 import { requireSubagentUser } from "@/features/auth/guards";
+import {
+  buildHistoricalOverdueAlerts,
+  DEFAULT_OVERDUE_LOOKBACK_DAYS,
+  getOverdueLookbackStart,
+} from "@/features/dashboard/overdue-alerts";
 import { getArgentinaDateKey } from "@/lib/operational-days";
 
 export const getMySubagentAccounts = cache(async () => {
@@ -16,7 +21,7 @@ export const getMySubagentAccounts = cache(async () => {
       .order("created_at"),
     supabase
       .from("user_alert_preferences")
-      .select("overdue_alerts_enabled, overdue_min_days")
+      .select("overdue_alerts_enabled, overdue_min_days, overdue_lookback_days")
       .eq("user_id", user.id)
       .maybeSingle(),
   ]);
@@ -28,8 +33,10 @@ export const getMySubagentAccounts = cache(async () => {
   const links = linksResult.data;
   const alertPreferences = alertPreferencesResult.data ?? {
     overdue_alerts_enabled: true,
+    overdue_lookback_days: DEFAULT_OVERDUE_LOOKBACK_DAYS,
     overdue_min_days: 1,
   };
+  const operationalDate = getArgentinaDateKey();
 
   const subagentIds = links.map((link) => link.subagent_id);
 
@@ -50,65 +57,70 @@ export const getMySubagentAccounts = cache(async () => {
     maquinolasResult,
     maquinolaSettlementsResult,
     maquinolaDashboardResult,
-  ] =
-    await Promise.all([
-      supabase
-        .from("daily_settlements")
-        .select(
-          "id, subagent_id, settlement_date, status, sales_amount, commission_amount, prizes_paid_amount, expected_amount, received_amount, debt_amount, notes, payments:settlement_payments(method, amount, voided_at)",
-        )
-        .in("subagent_id", subagentIds)
-        .order("settlement_date", { ascending: false })
-        .limit(200),
-      supabase
-        .from("subagent_account_movements")
-        .select(
-          "id, subagent_id, type, direction, amount, notes, created_at, voided_at, business_day:business_days(date), settlement:daily_settlements(id, settlement_date)",
-        )
-        .in("subagent_id", subagentIds)
-        .order("created_at", { ascending: false })
-        .limit(300),
-      Promise.all(
-        subagentIds.map(async (subagentId) => {
-          const { data, error } = await supabase.rpc(
-            "get_subagent_account_summary",
-            {
-              p_subagent_id: subagentId,
-            },
-          );
+    gapSummaryResult,
+  ] = await Promise.all([
+    supabase
+      .from("daily_settlements")
+      .select(
+        "id, subagent_id, settlement_date, status, sales_amount, commission_amount, prizes_paid_amount, expected_amount, received_amount, debt_amount, notes, payments:settlement_payments(method, amount, voided_at)",
+      )
+      .in("subagent_id", subagentIds)
+      .order("settlement_date", { ascending: false })
+      .limit(200),
+    supabase
+      .from("subagent_account_movements")
+      .select(
+        "id, subagent_id, type, direction, amount, notes, created_at, voided_at, business_day:business_days(date), settlement:daily_settlements(id, settlement_date)",
+      )
+      .in("subagent_id", subagentIds)
+      .order("created_at", { ascending: false })
+      .limit(300),
+    Promise.all(
+      subagentIds.map(async (subagentId) => {
+        const { data, error } = await supabase.rpc(
+          "get_subagent_account_summary",
+          {
+            p_subagent_id: subagentId,
+          },
+        );
 
-          if (error) {
-            throw new Error(
-              "No se pudo calcular un saldo de cuenta corriente.",
-            );
-          }
+        if (error) {
+          throw new Error("No se pudo calcular un saldo de cuenta corriente.");
+        }
 
-          return {
-            subagentId,
-            summary: data[0],
-          };
-        }),
+        return {
+          subagentId,
+          summary: data[0],
+        };
+      }),
+    ),
+    supabase.rpc("get_subagent_dashboard", {
+      p_date: operationalDate,
+    }),
+    supabase
+      .from("maquinolas")
+      .select("id, number, subagent_id, status, assigned_at")
+      .in("subagent_id", subagentIds)
+      .order("number"),
+    supabase
+      .from("maquinola_settlements")
+      .select(
+        "id, maquinola_id, subagent_id, settlement_date, status, sales_amount, prizes_paid_amount, expected_amount, received_amount, debt_amount, prize_credit_amount, overpayment_credit_amount, notes, payments:maquinola_settlement_payments(method, amount, voided_at)",
+      )
+      .in("subagent_id", subagentIds)
+      .order("settlement_date", { ascending: false })
+      .limit(300),
+    supabase.rpc("get_maquinola_dashboard", {
+      p_date: operationalDate,
+    }),
+    supabase.rpc("get_settlement_gap_summary", {
+      p_from: getOverdueLookbackStart(
+        operationalDate,
+        alertPreferences.overdue_lookback_days,
       ),
-      supabase.rpc("get_subagent_dashboard", {
-        p_date: getArgentinaDateKey(),
-      }),
-      supabase
-        .from("maquinolas")
-        .select("id, number, subagent_id, status, assigned_at")
-        .in("subagent_id", subagentIds)
-        .order("number"),
-      supabase
-        .from("maquinola_settlements")
-        .select(
-          "id, maquinola_id, subagent_id, settlement_date, status, sales_amount, prizes_paid_amount, expected_amount, received_amount, debt_amount, prize_credit_amount, overpayment_credit_amount, notes, payments:maquinola_settlement_payments(method, amount, voided_at)",
-        )
-        .in("subagent_id", subagentIds)
-        .order("settlement_date", { ascending: false })
-        .limit(300),
-      supabase.rpc("get_maquinola_dashboard", {
-        p_date: getArgentinaDateKey(),
-      }),
-    ]);
+      p_to: operationalDate,
+    }),
+  ]);
 
   if (
     settlementsResult.error ||
@@ -116,7 +128,8 @@ export const getMySubagentAccounts = cache(async () => {
     dashboardResult.error ||
     maquinolasResult.error ||
     maquinolaSettlementsResult.error ||
-    maquinolaDashboardResult.error
+    maquinolaDashboardResult.error ||
+    gapSummaryResult.error
   ) {
     throw new Error("No se pudo cargar el historial de la cuenta corriente.");
   }
@@ -144,11 +157,11 @@ export const getMySubagentAccounts = cache(async () => {
     })),
     alertPreferences,
     alerts: alertPreferences.overdue_alerts_enabled
-      ? dashboardResult.data.filter(
-          (row) =>
-            ["late", "late_serious", "late_critical"].includes(
-              row.dashboard_status,
-            ) && row.delay_days >= alertPreferences.overdue_min_days,
+      ? buildHistoricalOverdueAlerts(
+          dashboardResult.data,
+          gapSummaryResult.data,
+          alertPreferences,
+          operationalDate,
         )
       : [],
     maquinolaAlerts: maquinolaDashboardResult.data.filter(
