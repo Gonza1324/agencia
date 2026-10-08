@@ -45,11 +45,11 @@ export function DailyClosureForm({
       className="space-y-5"
       onSubmit={(event) => {
         const detail = hasDifference
-          ? " El cierre contiene diferencias y conservará la nota ingresada."
+          ? " El arqueo contiene diferencias y conservará la nota ingresada."
           : "";
         if (
           !window.confirm(
-            `¿Confirmás cerrar el día ${businessDate}?${detail} No se podrán registrar movimientos hasta reabrirlo.`,
+            `¿Confirmás guardar el arqueo del ${businessDate}?${detail} La caja no aceptará nuevos movimientos hasta reabrirla.`,
           )
         ) {
           event.preventDefault();
@@ -173,7 +173,7 @@ function CloseButton() {
       {pending ? (
         <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
       ) : null}
-      {pending ? "Cerrando..." : "Cerrar día"}
+      {pending ? "Guardando..." : "Guardar arqueo"}
     </Button>
   );
 }

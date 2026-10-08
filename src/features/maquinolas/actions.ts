@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import {
-  requireOperator,
-  requireOwnerAdmin,
-} from "@/features/auth/guards";
+import { requireOperator, requireOwnerAdmin } from "@/features/auth/guards";
 import type { MaquinolaFormState } from "@/features/maquinolas/state";
 import {
   maquinolaIdSchema,
@@ -37,8 +34,15 @@ function parseSettlement(formData: FormData) {
 }
 
 function mutationError(code?: string, message?: string) {
-  if (code === "23505") return "Ya existe ese número o un cierre para esa fecha.";
+  if (code === "23505")
+    return "Ya existe ese número o un cierre para esa fecha.";
   if (message?.includes("inactiva")) return message;
+  if (
+    message?.includes("día operativo está cerrado") ||
+    message?.includes("caja del día de hoy está cerrada")
+  ) {
+    return "La caja de hoy está cerrada. Reabrila para registrar el cierre.";
+  }
   return "No se pudo guardar. Intentá nuevamente.";
 }
 
@@ -54,14 +58,28 @@ export async function createMaquinolaAction(
   formData: FormData,
 ): Promise<MaquinolaFormState> {
   const parsed = parseEntity(formData);
-  if (!parsed.success) return { status: "error", message: "Revisá los campos.", fieldErrors: parsed.error.flatten().fieldErrors };
+  if (!parsed.success)
+    return {
+      status: "error",
+      message: "Revisá los campos.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
   const { supabase, user } = await requireOperator();
   const { data, error } = await supabase
     .from("maquinolas")
-    .insert({ number: parsed.data.number, subagent_id: parsed.data.subagentId, created_by: user.id, updated_by: user.id })
+    .insert({
+      number: parsed.data.number,
+      subagent_id: parsed.data.subagentId,
+      created_by: user.id,
+      updated_by: user.id,
+    })
     .select("id")
     .single();
-  if (error) return { status: "error", message: mutationError(error.code, error.message) };
+  if (error)
+    return {
+      status: "error",
+      message: mutationError(error.code, error.message),
+    };
   revalidateMaquinolas();
   redirect(`/maquinolas/${data.id}?created=1`);
 }
@@ -72,15 +90,30 @@ export async function updateMaquinolaAction(
 ): Promise<MaquinolaFormState> {
   const id = maquinolaIdSchema.safeParse(formData.get("id"));
   const parsed = parseEntity(formData);
-  if (!id.success || !parsed.success) return { status: "error", message: "Revisá los campos.", fieldErrors: parsed.success ? undefined : parsed.error.flatten().fieldErrors };
+  if (!id.success || !parsed.success)
+    return {
+      status: "error",
+      message: "Revisá los campos.",
+      fieldErrors: parsed.success
+        ? undefined
+        : parsed.error.flatten().fieldErrors,
+    };
   const { supabase, user } = await requireOperator();
   const { data, error } = await supabase
     .from("maquinolas")
-    .update({ number: parsed.data.number, subagent_id: parsed.data.subagentId, updated_by: user.id })
+    .update({
+      number: parsed.data.number,
+      subagent_id: parsed.data.subagentId,
+      updated_by: user.id,
+    })
     .eq("id", id.data)
     .select("id")
     .maybeSingle();
-  if (error || !data) return { status: "error", message: mutationError(error?.code, error?.message) };
+  if (error || !data)
+    return {
+      status: "error",
+      message: mutationError(error?.code, error?.message),
+    };
   revalidateMaquinolas();
   redirect(`/maquinolas/${data.id}?updated=1`);
 }
@@ -88,10 +121,17 @@ export async function updateMaquinolaAction(
 export async function toggleMaquinolaStatusAction(formData: FormData) {
   const id = maquinolaIdSchema.parse(formData.get("id"));
   const { supabase, user } = await requireOperator();
-  const { data: current } = await supabase.from("maquinolas").select("status").eq("id", id).maybeSingle();
+  const { data: current } = await supabase
+    .from("maquinolas")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
   if (!current) redirect("/maquinolas?error=not-found");
   const next = current.status === "active" ? "inactive" : "active";
-  const { error } = await supabase.from("maquinolas").update({ status: next, updated_by: user.id }).eq("id", id);
+  const { error } = await supabase
+    .from("maquinolas")
+    .update({ status: next, updated_by: user.id })
+    .eq("id", id);
   if (error) redirect(`/maquinolas/${id}?statusError=1`);
   revalidateMaquinolas();
   redirect(`/maquinolas/${id}?status=${next}`);
@@ -102,7 +142,12 @@ export async function createMaquinolaSettlementAction(
   formData: FormData,
 ): Promise<MaquinolaFormState> {
   const parsed = parseSettlement(formData);
-  if (!parsed.success) return { status: "error", message: "Revisá los campos.", fieldErrors: parsed.error.flatten().fieldErrors };
+  if (!parsed.success)
+    return {
+      status: "error",
+      message: "Revisá los campos.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
   const { supabase } = await requireOperator();
   const { data, error } = await supabase.rpc("create_maquinola_settlement", {
     p_settlement_date: parsed.data.settlementDate,
@@ -113,7 +158,11 @@ export async function createMaquinolaSettlementAction(
     p_prizes_paid_amount: parsed.data.prizesPaidAmount,
     p_notes: parsed.data.notes,
   });
-  if (error) return { status: "error", message: mutationError(error.code, error.message) };
+  if (error)
+    return {
+      status: "error",
+      message: mutationError(error.code, error.message),
+    };
   revalidateMaquinolas();
   redirect(`/maquinolas/cierres/${data}?created=1`);
 }
@@ -124,7 +173,14 @@ export async function updateMaquinolaSettlementAction(
 ): Promise<MaquinolaFormState> {
   const id = maquinolaIdSchema.safeParse(formData.get("id"));
   const parsed = parseSettlement(formData);
-  if (!id.success || !parsed.success) return { status: "error", message: "Revisá los campos.", fieldErrors: parsed.success ? undefined : parsed.error.flatten().fieldErrors };
+  if (!id.success || !parsed.success)
+    return {
+      status: "error",
+      message: "Revisá los campos.",
+      fieldErrors: parsed.success
+        ? undefined
+        : parsed.error.flatten().fieldErrors,
+    };
   const { supabase } = await requireOwnerAdmin();
   const { data, error } = await supabase.rpc("replace_maquinola_settlement", {
     p_previous_settlement_id: id.data,
@@ -136,7 +192,11 @@ export async function updateMaquinolaSettlementAction(
     p_prizes_paid_amount: parsed.data.prizesPaidAmount,
     p_notes: parsed.data.notes,
   });
-  if (error) return { status: "error", message: mutationError(error.code, error.message) };
+  if (error)
+    return {
+      status: "error",
+      message: mutationError(error.code, error.message),
+    };
   revalidateMaquinolas();
   redirect(`/maquinolas/cierres/${data}?updated=1`);
 }
@@ -145,11 +205,26 @@ export async function voidMaquinolaSettlementAction(
   _state: MaquinolaFormState,
   formData: FormData,
 ): Promise<MaquinolaFormState> {
-  const parsed = voidMaquinolaSettlementSchema.safeParse({ id: formData.get("id"), reason: formData.get("reason") });
-  if (!parsed.success) return { status: "error", message: "Ingresá un motivo válido.", fieldErrors: parsed.error.flatten().fieldErrors };
+  const parsed = voidMaquinolaSettlementSchema.safeParse({
+    id: formData.get("id"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success)
+    return {
+      status: "error",
+      message: "Ingresá un motivo válido.",
+      fieldErrors: parsed.error.flatten().fieldErrors,
+    };
   const { supabase } = await requireOwnerAdmin();
-  const { error } = await supabase.rpc("void_maquinola_settlement", { p_settlement_id: parsed.data.id, p_reason: parsed.data.reason });
-  if (error) return { status: "error", message: mutationError(error.code, error.message) };
+  const { error } = await supabase.rpc("void_maquinola_settlement", {
+    p_settlement_id: parsed.data.id,
+    p_reason: parsed.data.reason,
+  });
+  if (error)
+    return {
+      status: "error",
+      message: mutationError(error.code, error.message),
+    };
   revalidateMaquinolas();
   redirect(`/maquinolas/cierres/${parsed.data.id}?voided=1`);
 }

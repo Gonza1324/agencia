@@ -533,7 +533,7 @@ export default async function DashboardPage() {
               <p className="mt-1 text-sm">
                 {hasClosureDifference
                   ? `Efectivo: ${formatMoney(Number(dashboard.closure?.cash_difference ?? 0))} · Banco: ${formatMoney(Number(dashboard.closure?.bank_difference ?? 0))}`
-                  : "Revisá el arqueo y cerrá el día cuando termine la operación."}
+                  : "Revisá y guardá el arqueo cuando termine la operación."}
               </p>
             </div>
             <Link

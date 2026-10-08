@@ -28,7 +28,7 @@ export function ReopenBusinessDayForm({
       onSubmit={(event) => {
         if (
           !window.confirm(
-            `¿Confirmás reabrir el día ${businessDate}? Volverá a aceptar movimientos y rendiciones.`,
+            `¿Confirmás reabrir la caja del ${businessDate}? Volverá a aceptar movimientos registrados en esa fecha.`,
           )
         ) {
           event.preventDefault();
@@ -37,14 +37,16 @@ export function ReopenBusinessDayForm({
     >
       <input type="hidden" name="businessDate" value={businessDate} />
       <label className="block">
-        <span className="text-sm font-medium">Motivo de reapertura</span>
+        <span className="text-sm font-medium">
+          Motivo de reapertura de caja
+        </span>
         <textarea
           className="mt-1 min-h-24 w-full rounded-md border bg-background px-3 py-2 text-sm"
           name="reason"
           minLength={3}
           maxLength={500}
           required
-          placeholder="Explicá por qué se necesita modificar el día"
+          placeholder="Explicá por qué se necesita reabrir la caja"
         />
         {state.fieldErrors?.reason?.length ? (
           <p className="mt-1 text-xs text-destructive">
@@ -53,8 +55,9 @@ export function ReopenBusinessDayForm({
         ) : null}
       </label>
       <p className="text-sm text-muted-foreground">
-        Reabrir habilitará nuevamente rendiciones y movimientos para esta fecha.
-        La acción quedará auditada.
+        No hace falta reabrir cajas históricas para cargar rendiciones
+        atrasadas: esos cobros ingresan en la caja de hoy. Esta acción quedará
+        auditada.
       </p>
       {state.message ? (
         <p className="text-sm text-destructive" role="alert">
@@ -76,7 +79,7 @@ function ReopenButton() {
       {pending ? (
         <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
       ) : null}
-      {pending ? "Reabriendo..." : "Reabrir día"}
+      {pending ? "Reabriendo..." : "Reabrir caja"}
     </Button>
   );
 }

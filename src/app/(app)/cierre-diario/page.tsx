@@ -29,7 +29,7 @@ export default async function DailyClosurePage({
     <div className="space-y-6">
       <header className="flex flex-col gap-4 border-b pb-5 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-medium text-primary">Cierre diario</p>
+          <p className="text-sm font-medium text-primary">Arqueo de caja</p>
           <div className="mt-1 flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-semibold tracking-tight">
               {formatDateKey(data.businessDate)}
@@ -47,8 +47,9 @@ export default async function DailyClosurePage({
             </Badge>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            Compará los saldos esperados con el efectivo contado y el banco
-            informado.
+            Compará los saldos contables con el efectivo contado y el banco
+            informado. La fecha del cierre de cada Subagente o Maquinola se
+            conserva por separado.
           </p>
         </div>
 
@@ -80,8 +81,8 @@ export default async function DailyClosurePage({
           role="status"
         >
           {notices.closed
-            ? "El día se cerró correctamente. Sus movimientos quedaron bloqueados."
-            : "El día se reabrió y vuelve a aceptar movimientos."}
+            ? "El arqueo se guardó correctamente. La caja quedó cerrada para nuevos movimientos."
+            : "La caja se reabrió y vuelve a aceptar movimientos."}
         </p>
       ) : null}
 
@@ -120,7 +121,7 @@ export default async function DailyClosurePage({
           <CardContent className="py-12 text-center">
             <h2 className="text-lg font-semibold">Domingo sin operación</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Los domingos no se abre ni se cierra un día operativo.
+              Los domingos no se abre ni se arquea una caja operativa.
             </p>
           </CardContent>
         </Card>
@@ -172,7 +173,7 @@ export default async function DailyClosurePage({
 
           <Card className="self-start">
             <CardHeader>
-              <CardTitle>Reabrir día</CardTitle>
+              <CardTitle>Reabrir caja</CardTitle>
             </CardHeader>
             <CardContent>
               <ReopenBusinessDayForm businessDate={data.businessDate} />
@@ -184,7 +185,7 @@ export default async function DailyClosurePage({
           <Card>
             <CardHeader>
               <CardTitle>
-                {wasReopened ? "Volver a cerrar el día" : "Registrar arqueo"}
+                {wasReopened ? "Actualizar arqueo" : "Registrar arqueo"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -198,7 +199,7 @@ export default async function DailyClosurePage({
 
           <Card className="self-start">
             <CardHeader>
-              <CardTitle>Reglas del cierre</CardTitle>
+              <CardTitle>Reglas del arqueo</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>
@@ -210,8 +211,10 @@ export default async function DailyClosurePage({
                 el motivo.
               </p>
               <p>
-                Una vez cerrado, el día no aceptará nuevas rendiciones ni
-                movimientos hasta que un dueño lo reabra.
+                Al cerrar la caja se bloquean nuevos movimientos contables en
+                esa fecha. Las rendiciones atrasadas pueden cargarse sin
+                reabrirla: conservan su fecha operativa, pero el dinero ingresa
+                en la caja abierta de hoy.
               </p>
               {wasReopened && closure ? (
                 <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-900">

@@ -83,8 +83,11 @@ function getMutationMessage(code?: string, message?: string) {
     return "El importe recibido no puede superar el importe esperado.";
   }
 
-  if (message?.includes("día operativo está cerrado")) {
-    return "El día operativo está cerrado. Reabrilo antes de modificar rendiciones.";
+  if (
+    message?.includes("día operativo está cerrado") ||
+    message?.includes("caja del día de hoy está cerrada")
+  ) {
+    return "La caja de hoy está cerrada. Reabrila para registrar la rendición.";
   }
 
   return "No se pudo guardar la rendición. Intentá nuevamente.";

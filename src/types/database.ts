@@ -1583,6 +1583,7 @@ export type Database = {
           today_settlement_id: string
         }[]
       }
+      get_writable_current_business_day: { Args: never; Returns: string }
       is_internal_user: { Args: never; Returns: boolean }
       is_owner_admin: { Args: never; Returns: boolean }
       pay_expense_obligation: {
