@@ -1,11 +1,28 @@
 import Link from "next/link";
 
 import { SettlementForm } from "@/features/settlements/settlement-form";
+import { resolveSettlementPrefill } from "@/features/settlements/prefill";
 import { getActiveSubagentsForSettlement } from "@/features/settlements/queries";
 import { getArgentinaDateKey } from "@/lib/operational-days";
 
-export default async function NewSettlementPage() {
-  const subagents = await getActiveSubagentsForSettlement();
+export default async function NewSettlementPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    date?: string | string[];
+    subagent?: string | string[];
+  }>;
+}) {
+  const [subagents, params] = await Promise.all([
+    getActiveSubagentsForSettlement(),
+    searchParams,
+  ]);
+  const today = getArgentinaDateKey();
+  const prefill = resolveSettlementPrefill(
+    params,
+    subagents.map((subagent) => subagent.id),
+    today,
+  );
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -25,9 +42,11 @@ export default async function NewSettlementPage() {
 
       {subagents.length ? (
         <SettlementForm
+          initialSettlementDate={prefill.settlementDate}
+          initialSubagentId={prefill.subagentId}
           mode="create"
           subagents={subagents}
-          today={getArgentinaDateKey()}
+          today={today}
         />
       ) : (
         <div className="rounded-lg border bg-card p-6">

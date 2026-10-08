@@ -28,6 +28,8 @@ import { formatMoney } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 type SettlementFormProps = {
+  initialSettlementDate?: string;
+  initialSubagentId?: string;
   mode: "create" | "edit";
   subagents: Array<{
     commission_percentage: number;
@@ -79,6 +81,8 @@ function SubmitButton({ mode }: { mode: SettlementFormProps["mode"] }) {
 }
 
 export function SettlementForm({
+  initialSettlementDate,
+  initialSubagentId,
   mode,
   settlement,
   subagents,
@@ -94,7 +98,9 @@ export function SettlementForm({
   const confirmationInputRef = useRef<HTMLInputElement>(null);
   const [showOverpaymentConfirmation, setShowOverpaymentConfirmation] =
     useState(false);
-  const [subagentId, setSubagentId] = useState(settlement?.subagentId ?? "");
+  const [subagentId, setSubagentId] = useState(
+    settlement?.subagentId ?? initialSubagentId ?? "",
+  );
   const [paymentMethod, setPaymentMethod] = useState(
     settlement?.paymentMethod ?? "cash",
   );
@@ -218,7 +224,9 @@ export function SettlementForm({
             className="mt-1 h-10 w-full rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             type="date"
             name="settlementDate"
-            defaultValue={settlement?.settlementDate ?? today}
+            defaultValue={
+              settlement?.settlementDate ?? initialSettlementDate ?? today
+            }
             max={today}
             aria-invalid={Boolean(state.fieldErrors?.settlementDate)}
             required

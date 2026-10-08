@@ -251,6 +251,36 @@ export default async function DashboardPage() {
                           ? ` y ${row.missing_dates.length - 6} más`
                           : ""}
                       </p>
+                      <details className="mt-3 rounded-md border border-current/15 bg-white/60 p-3">
+                        <summary className="cursor-pointer text-sm font-semibold text-primary">
+                          Ver y cargar {row.delay_days}{" "}
+                          {row.delay_days === 1
+                            ? "fecha faltante"
+                            : "fechas faltantes"}
+                        </summary>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {row.missing_dates.map((date) => (
+                            <Link
+                              key={date}
+                              href={`/rendiciones/nueva?subagent=${row.subagent_id}&date=${date}`}
+                              prefetch={false}
+                              className={cn(
+                                buttonVariants({
+                                  size: "sm",
+                                  variant: "secondary",
+                                }),
+                                "h-auto gap-1.5 py-1.5",
+                              )}
+                            >
+                              <Plus
+                                className="h-3.5 w-3.5"
+                                aria-hidden="true"
+                              />
+                              {formatDateKey(date)}
+                            </Link>
+                          ))}
+                        </div>
+                      </details>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
                       <Link
@@ -264,11 +294,11 @@ export default async function DashboardPage() {
                       </Link>
                       {dashboard.userCanOperate ? (
                         <Link
-                          href="/rendiciones/nueva"
+                          href={`/rendiciones/nueva?subagent=${row.subagent_id}&date=${row.missing_dates[0]}`}
                           prefetch={false}
                           className={cn(buttonVariants({ size: "sm" }))}
                         >
-                          Registrar rendición
+                          Cargar fecha más reciente
                         </Link>
                       ) : null}
                     </div>
